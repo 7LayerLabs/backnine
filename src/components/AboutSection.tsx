@@ -14,10 +14,10 @@ export default function AboutSection() {
             />
           </div>
           <div className="space-y-6">
-            <span className="text-sm tracking-[0.3em] text-stone-500 uppercase">
+            <span className="text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">
               Our Story
             </span>
-            <h2 className="text-4xl md:text-5xl font-dm-serif text-stone-900">
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold tracking-wide text-stone-900 uppercase">
               Where Passion Meets the Fairway
             </h2>
             <p className="text-stone-600 leading-relaxed">

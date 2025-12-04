@@ -15,7 +15,7 @@ export default function Footer() {
                 height={50}
                 className="rounded"
               />
-              <h3 className="text-xl font-semibold">Back Nine</h3>
+              <h3 className="text-xl font-bold tracking-wide font-montserrat">BACK NINE</h3>
             </div>
             <p className="text-stone-400 text-sm leading-relaxed">
               Premium golf lifestyle clothing for those who appreciate the finer

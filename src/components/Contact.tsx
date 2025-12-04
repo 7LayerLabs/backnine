@@ -20,14 +20,14 @@ export default function Contact() {
   return (
     <section id="contact" className="py-20 bg-stone-50">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-dm-serif text-stone-900 text-center mb-12">
+        <h2 className="text-3xl font-montserrat font-bold tracking-wide text-stone-900 text-center mb-12 uppercase">
           Get In Touch
         </h2>
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-8">
             <div>
               <h4 className="font-semibold text-stone-900 mb-2">Email</h4>
-              <p className="text-stone-600">hello@backnineapparel.com</p>
+              <p className="text-stone-600">hello@backnineshop.com</p>
             </div>
             <div>
               <h4 className="font-semibold text-stone-900 mb-2">Follow Us</h4>

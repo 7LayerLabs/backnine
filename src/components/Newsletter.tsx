@@ -43,10 +43,10 @@ export default function Newsletter() {
   return (
     <section className="py-20 bg-stone-900">
       <div className="max-w-2xl mx-auto px-6 text-center">
-        <span className="text-sm tracking-[0.3em] text-stone-400 uppercase">
+        <span className="text-sm tracking-[0.3em] text-stone-400 uppercase font-montserrat">
           Stay Connected
         </span>
-        <h2 className="text-4xl font-dm-serif text-white mt-2 mb-4">
+        <h2 className="text-3xl font-montserrat font-bold tracking-wide text-white mt-2 mb-4 uppercase">
           Join the Club
         </h2>
         <p className="text-stone-400 mb-8">

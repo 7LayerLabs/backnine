@@ -7,10 +7,10 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-6 py-20 w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <p className="text-sm tracking-[0.3em] text-stone-500 uppercase font-inter">Est. 2025</p>
-            <h1 className="font-dm-serif text-6xl md:text-7xl lg:text-8xl text-stone-900">
-              Back Nine
-              <span className="block text-emerald-700 italic">Apparel</span>
+            <p className="text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">Est. 2025</p>
+            <h1 className="font-montserrat text-5xl md:text-6xl lg:text-7xl text-stone-900 font-bold tracking-wide">
+              BACK NINE
+              <span className="block text-emerald-700">APPAREL</span>
             </h1>
             <p className="text-lg text-stone-600 max-w-md font-inter leading-relaxed">
               Premium golf lifestyle clothing for those who appreciate the finer things — on and off the course.
