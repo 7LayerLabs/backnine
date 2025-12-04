@@ -27,6 +27,14 @@ export interface Order {
   createdAt: number;
 }
 
+export interface Subscriber {
+  id: string;
+  email: string;
+  discountCode: string;
+  subscribedAt: number;
+  hasUsedDiscount: boolean;
+}
+
 // InstantDB schema
 const schema = {
   products: {
@@ -48,6 +56,12 @@ const schema = {
     total: "number",
     status: "string",
     createdAt: "number",
+  },
+  subscribers: {
+    email: "string",
+    discountCode: "string",
+    subscribedAt: "number",
+    hasUsedDiscount: "boolean",
   },
 } as const;
 
