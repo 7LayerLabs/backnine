@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
-import { getStripe } from "@/lib/stripe";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -49,10 +48,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       if (data.url) {
         // Redirect to Stripe Checkout
         window.location.href = data.url;
-      } else if (data.sessionId) {
-        // Fallback: use Stripe.js to redirect
-        const stripe = await getStripe();
-        await stripe?.redirectToCheckout({ sessionId: data.sessionId });
+      } else {
+        throw new Error("No checkout URL returned");
       }
     } catch (error) {
       console.error("Checkout error:", error);
