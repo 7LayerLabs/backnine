@@ -30,7 +30,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Query cart items from InstantDB
   const { isLoading, error, data } = db.useQuery({ cartItems: {} });
 
-  const items: CartItem[] = data?.cartItems ?? [];
+  const items = (data?.cartItems ?? []) as CartItem[];
 
   const addItem = (item: Omit<CartItem, "id">) => {
     // Check if item already exists with same productId and size
