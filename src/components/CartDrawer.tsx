@@ -161,6 +161,36 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             >
               {isLoading ? "Processing..." : "Checkout"}
             </button>
+            {/* Payment Methods */}
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <span className="text-xs text-stone-400">Pay with</span>
+              {/* Credit Card Icons */}
+              <svg className="h-6 w-auto" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="38" height="24" rx="4" fill="#1A1F71"/>
+                <path d="M15.5 16.5L17 7.5H19.5L18 16.5H15.5Z" fill="white"/>
+                <path d="M24 7.5C23.5 7.3 22.7 7 21.7 7C19.2 7 17.5 8.3 17.5 10.1C17.5 11.5 18.8 12.2 19.8 12.7C20.8 13.2 21.1 13.5 21.1 13.9C21.1 14.5 20.4 14.8 19.7 14.8C18.7 14.8 18.2 14.6 17.4 14.3L17.1 14.2L16.8 16.1C17.4 16.4 18.4 16.6 19.5 16.6C22.2 16.6 23.8 15.3 23.8 13.4C23.8 12.3 23.1 11.5 21.6 10.8C20.7 10.4 20.2 10.1 20.2 9.6C20.2 9.2 20.7 8.8 21.6 8.8C22.4 8.8 23 9 23.4 9.2L23.6 9.3L24 7.5Z" fill="white"/>
+                <path d="M28.5 7.5H26.5C25.9 7.5 25.5 7.7 25.2 8.3L21.5 16.5H24.2L24.7 15H28L28.3 16.5H30.7L28.5 7.5ZM25.4 13C25.6 12.4 26.5 10 26.5 10C26.5 10 26.7 9.4 26.8 9.1L27 10L27.6 13H25.4Z" fill="white"/>
+                <path d="M13.5 7.5L11 13.5L10.7 12C10.2 10.5 8.8 8.8 7.2 8L9.5 16.5H12.2L16.2 7.5H13.5Z" fill="white"/>
+                <path d="M9 7.5H5L5 7.7C8.2 8.5 10.3 10.5 11 12.5L10.2 8.3C10.1 7.7 9.6 7.5 9 7.5Z" fill="#F9A51A"/>
+              </svg>
+              {/* Mastercard */}
+              <svg className="h-6 w-auto" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="38" height="24" rx="4" fill="#F5F5F5"/>
+                <circle cx="15" cy="12" r="7" fill="#EB001B"/>
+                <circle cx="23" cy="12" r="7" fill="#F79E1B"/>
+                <path d="M19 6.8C20.3 7.9 21.1 9.5 21.1 11.3C21.1 13.1 20.3 14.7 19 15.8C17.7 14.7 16.9 13.1 16.9 11.3C16.9 9.5 17.7 7.9 19 6.8Z" fill="#FF5F00"/>
+              </svg>
+              {/* Klarna */}
+              <svg className="h-6 w-auto" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="38" height="24" rx="4" fill="#FFB3C7"/>
+                <path d="M8 8H10.2V16H8V8Z" fill="black"/>
+                <path d="M11 8H13.2C13.2 9.5 12.6 10.8 11.6 11.8L14 16H11.4L9.2 12L10.2 11.2C11.2 10.4 11.8 9.2 11.8 8H11Z" fill="black"/>
+                <path d="M14.5 8H16.7V16H14.5V8Z" fill="black"/>
+                <path d="M21.5 8H19V16H21.2V13.2L23.7 16H26.5L23.3 12.5C24.4 11.9 25.2 10.8 25.2 9.5C25.2 8.1 24 7 22.3 7H19V8H21.5C22.3 8 23 8.6 23 9.5C23 10.4 22.3 11 21.5 11H21.2V8H21.5Z" fill="black"/>
+                <path d="M27 8C27 8.8 27.7 9.5 28.5 9.5C29.3 9.5 30 8.8 30 8C30 7.2 29.3 6.5 28.5 6.5C27.7 6.5 27 7.2 27 8Z" fill="black"/>
+                <path d="M27.4 10H29.6V16H27.4V10Z" fill="black"/>
+              </svg>
+            </div>
             <button
               onClick={clearCart}
               className="w-full py-2 text-stone-500 hover:text-stone-700 text-sm"
