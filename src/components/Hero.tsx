@@ -13,7 +13,7 @@ export default function Hero() {
               <span className="block text-emerald-700">APPAREL</span>
             </h1>
             <p className="text-lg text-stone-600 max-w-md font-inter leading-relaxed">
-              Golf gear that goes from the course to the bar. Look good. Play better. Finish strong.
+              Golf gear that goes from the course to the clubhouse. Look good. Play better. Finish strong.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
               <Link
