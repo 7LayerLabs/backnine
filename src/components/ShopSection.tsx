@@ -130,13 +130,13 @@ export default function ShopSection() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <span className="text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">
-            The Collection
+            The Lineup
           </span>
           <h2 className="text-3xl md:text-4xl font-montserrat font-bold tracking-wide text-stone-900 mt-2 uppercase">
-            Crafted for the Course
+            Gear Up
           </h2>
           <p className="text-stone-600 mt-4 max-w-xl mx-auto">
-            Premium apparel designed for those who appreciate quality, style, and the game.
+            Clean fits that work on the course and after. No country club vibes — just good gear.
           </p>
         </div>
 

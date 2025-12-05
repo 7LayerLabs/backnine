@@ -13,7 +13,7 @@ export default function Hero() {
               <span className="block text-emerald-700">APPAREL</span>
             </h1>
             <p className="text-lg text-stone-600 max-w-md font-inter leading-relaxed">
-              Premium golf lifestyle clothing for those who appreciate the finer things — on and off the course.
+              Golf gear that goes from the course to the bar. Look good. Play better. Finish strong.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
               <Link

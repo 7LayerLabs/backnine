@@ -44,13 +44,13 @@ export default function Newsletter() {
     <section className="py-20 bg-stone-900">
       <div className="max-w-2xl mx-auto px-6 text-center">
         <span className="text-sm tracking-[0.3em] text-stone-400 uppercase font-montserrat">
-          Stay Connected
+          Get In
         </span>
         <h2 className="text-3xl font-montserrat font-bold tracking-wide text-white mt-2 mb-4 uppercase">
-          Join the Club
+          Join the Crew
         </h2>
         <p className="text-stone-400 mb-8">
-          Subscribe for exclusive drops, early access, and 10% off your first order.
+          First dibs on new drops, exclusive deals, and 10% off your first order. No spam, just the good stuff.
         </p>
         {isSubmitted ? (
           <p className="text-emerald-400 font-medium">

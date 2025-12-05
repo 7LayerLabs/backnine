@@ -41,7 +41,7 @@ export default function Contact() {
     <section id="contact" className="py-20 bg-stone-50">
       <div className="max-w-7xl mx-auto px-6">
         <h2 className="text-3xl font-montserrat font-bold tracking-wide text-stone-900 text-center mb-12 uppercase">
-          Get In Touch
+          Hit Us Up
         </h2>
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-8">
@@ -106,7 +106,7 @@ export default function Contact() {
           <div>
             {isSubmitted ? (
               <p className="text-emerald-600 font-medium">
-                Thanks for reaching out! We&apos;ll get back to you soon.
+                Got it. We&apos;ll hit you back soon.
               </p>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">

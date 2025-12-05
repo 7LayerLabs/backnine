@@ -18,35 +18,33 @@ export default function AboutSection() {
               Our Story
             </span>
             <h2 className="text-3xl md:text-4xl font-montserrat font-bold tracking-wide text-stone-900 uppercase">
-              Where Passion Meets the Fairway
+              Built for the Back Nine
             </h2>
             <p className="text-stone-600 leading-relaxed">
-              Back Nine Apparel was founded in 2025 with a simple mission: create premium
-              golf lifestyle clothing that looks as good at the 19th hole as it does on
-              the fairway.
+              We started Back Nine in 2025 because golf apparel was either too stuffy or too boring.
+              We wanted gear you could wear from your morning round to happy hour without missing a beat.
             </p>
             <p className="text-stone-600 leading-relaxed">
-              We believe golf is more than a sport — it&apos;s a lifestyle. Our designs blend
-              classic golf aesthetics with modern streetwear sensibility, perfect for the
-              course, the clubhouse, or anywhere life takes you.
+              Golf is where you close deals, catch up with the boys, and clear your head.
+              Your gear should match that energy — clean, confident, and ready for whatever comes next.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6">
               <div>
-                <h4 className="font-semibold text-stone-900 mb-2">Premium Quality</h4>
+                <h4 className="font-semibold text-stone-900 mb-2">Quality That Lasts</h4>
                 <p className="text-sm text-stone-600">
-                  Carefully selected fabrics for comfort and durability
+                  Premium fabrics that hold up round after round
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-stone-900 mb-2">Unique Designs</h4>
+                <h4 className="font-semibold text-stone-900 mb-2">Fresh Designs</h4>
                 <p className="text-sm text-stone-600">
-                  Original artwork celebrating golf culture
+                  Golf style that doesn't look like your dad's closet
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-stone-900 mb-2">Made for Golfers</h4>
+                <h4 className="font-semibold text-stone-900 mb-2">By Golfers</h4>
                 <p className="text-sm text-stone-600">
-                  By golfers who understand the lifestyle
+                  We play. We get it. We built this for us.
                 </p>
               </div>
             </div>

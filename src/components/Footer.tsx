@@ -18,8 +18,8 @@ export default function Footer() {
               <h3 className="text-xl font-bold tracking-wide font-montserrat">BACK NINE</h3>
             </div>
             <p className="text-stone-400 text-sm leading-relaxed">
-              Premium golf lifestyle clothing for those who appreciate the finer
-              things on and off the course.
+              Golf gear for guys who play hard and look good doing it.
+              Course to bar, we got you.
             </p>
             {/* Social Media Links */}
             <div className="flex items-center gap-4 pt-2">

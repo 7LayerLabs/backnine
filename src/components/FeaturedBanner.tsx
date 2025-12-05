@@ -3,8 +3,8 @@
 export default function FeaturedBanner() {
   const messages = [
     { text: "FREE SHIPPING on orders over $75", highlight: "FREE SHIPPING" },
-    { text: "Join the Club & get 10% OFF your first order", highlight: "10% OFF" },
-    { text: "Premium golf lifestyle apparel", highlight: "Premium" },
+    { text: "Get 10% OFF your first order — Use code WELCOME10", highlight: "10% OFF" },
+    { text: "From the course to the bar — Gear that keeps up", highlight: "Gear that keeps up" },
   ];
 
   return (
