@@ -8,8 +8,8 @@ export default function LifestyleSection() {
         <div className="grid md:grid-cols-2 gap-6">
           <div className="group relative overflow-hidden aspect-[4/5]">
             <Image
-              src="/hero-lifestyle-2.png"
-              alt="Back Nine Apparel - Par-Tee Time Hoodie"
+              src="/apparel/marketing/b9mkt6.png"
+              alt="Back Nine Apparel - Classic Collection"
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
@@ -26,8 +26,8 @@ export default function LifestyleSection() {
           </div>
           <div className="group relative overflow-hidden aspect-[4/5]">
             <Image
-              src="/hero-lifestyle-1.png"
-              alt="Back Nine Apparel - Classic Hoodie and Hat"
+              src="/apparel/marketing/b9_mkt2.png"
+              alt="Back Nine Apparel - Par-Tee Time"
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
