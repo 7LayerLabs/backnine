@@ -319,7 +319,7 @@ export default function TermsOfService() {
               </p>
               <div className="bg-stone-50 rounded-lg p-6">
                 <p className="text-stone-800 font-medium">Back Nine Apparel</p>
-                <p className="text-stone-600">Email: hello@backnineapparel.com</p>
+                <p className="text-stone-600">Email: hello@backnineshop.com</p>
                 <p className="text-stone-600 mt-4">
                   We will respond to your inquiry within 30 days.
                 </p>

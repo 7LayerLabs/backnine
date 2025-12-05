@@ -9,12 +9,32 @@ export default function Contact() {
     message: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Connect to email service (Resend)
-    setIsSubmitted(true);
-    setFormData({ name: "", email: "", message: "" });
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      setIsSubmitted(true);
+      setFormData({ name: "", email: "", message: "" });
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -122,10 +142,14 @@ export default function Contact() {
                 />
                 <button
                   type="submit"
-                  className="w-full py-4 bg-stone-900 text-white font-medium hover:bg-stone-800 transition-colors"
+                  disabled={isLoading}
+                  className="w-full py-4 bg-stone-900 text-white font-medium hover:bg-stone-800 transition-colors disabled:bg-stone-400 disabled:cursor-not-allowed"
                 >
-                  Send Message
+                  {isLoading ? "Sending..." : "Send Message"}
                 </button>
+                {error && (
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                )}
               </form>
             )}
           </div>

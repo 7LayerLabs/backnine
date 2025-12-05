@@ -183,7 +183,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Withdraw Consent:</strong> Withdraw consent where processing is based on consent</li>
               </ul>
               <p className="text-stone-600 mt-4">
-                To exercise any of these rights, please contact us at hello@backnineapparel.com.
+                To exercise any of these rights, please contact us at hello@backnineshop.com.
                 We will respond to your request within 30 days.
               </p>
             </section>
@@ -203,7 +203,7 @@ export default function PrivacyPolicy() {
               </ul>
               <p className="text-stone-600 mt-4">
                 We do not sell your personal information. To make a CCPA request, contact us at
-                hello@backnineapparel.com.
+                hello@backnineshop.com.
               </p>
             </section>
 
@@ -259,7 +259,7 @@ export default function PrivacyPolicy() {
               </p>
               <div className="bg-stone-50 rounded-lg p-6">
                 <p className="text-stone-800 font-medium">Back Nine Apparel</p>
-                <p className="text-stone-600">Email: hello@backnineapparel.com</p>
+                <p className="text-stone-600">Email: hello@backnineshop.com</p>
                 <p className="text-stone-600 mt-4">
                   We will respond to your inquiry within 30 days.
                 </p>
