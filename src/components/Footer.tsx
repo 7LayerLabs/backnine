@@ -162,7 +162,7 @@ export default function Footer() {
             <Image src="/payment logos/amex.svg" alt="American Express" width={50} height={32} className="h-8 w-auto" />
             <img src="/payment logos/klarna.png" alt="Klarna" className="h-8 w-auto" />
           </div>
-          <p className="text-center text-stone-500 text-sm">&copy; 2025 Back Nine Apparel. All rights reserved.</p>
+          <p className="text-center text-stone-500 text-sm">&copy; <Link href="/admin/orders" className="hover:text-stone-400 transition-colors">2025 Back Nine Apparel</Link>. All rights reserved.</p>
         </div>
       </div>
     </footer>
