@@ -11,19 +11,21 @@ interface QuickViewModalProps {
   onClose: () => void;
 }
 
-const sizes = ["S", "M", "L", "XL", "XXL"];
+const defaultSizes = ["S", "M", "L", "XL", "XXL"];
 
-export default function QuickViewModal({ 
-  product, 
-  initialColor, 
-  onClose 
+export default function QuickViewModal({
+  product,
+  initialColor,
+  onClose
 }: QuickViewModalProps) {
-  const [selectedSize, setSelectedSize] = useState("M");
+  const availableSizes = product.sizes || defaultSizes;
+  const [selectedSize, setSelectedSize] = useState(availableSizes[Math.floor(availableSizes.length / 2)] || "M");
   const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(
     initialColor ?? product.colors?.[0]
   );
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [activeTab, setActiveTab] = useState<"details" | "features" | "care">("details");
   const { addItem } = useCart();
 
   const currentImage = selectedColor?.image ?? product.image;
@@ -122,11 +124,11 @@ export default function QuickViewModal({
                 Size
               </label>
               <div className="flex flex-wrap gap-2">
-                {sizes.map((size) => (
+                {availableSizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-10 h-10 sm:w-12 sm:h-12 text-xs sm:text-sm font-medium transition-colors ${
+                    className={`px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors ${
                       selectedSize === size
                         ? "bg-stone-900 text-white"
                         : "bg-stone-100 text-stone-700 hover:bg-stone-200"
@@ -170,14 +172,96 @@ export default function QuickViewModal({
               {isAdded ? "Added to Cart!" : "Add to Cart"}
             </button>
 
-            <div className="mt-8 pt-6 border-t border-stone-200">
-              <h4 className="font-medium text-stone-900 mb-3">Product Details</h4>
-              <ul className="text-sm text-stone-600 space-y-2">
-                <li>Premium quality materials</li>
-                <li>Comfortable fit</li>
-                <li>Machine washable</li>
-                <li>Back Nine Apparel branding</li>
-              </ul>
+            {/* Detailed Product Information */}
+            <div className="mt-6 pt-6 border-t border-stone-200">
+              {/* Long Description */}
+              {product.longDescription && (
+                <p className="text-sm text-stone-600 mb-4 leading-relaxed">
+                  {product.longDescription}
+                </p>
+              )}
+
+              {/* Tabs for Features/Care/Shipping */}
+              {(product.features || product.careInstructions || product.shipping) && (
+                <div>
+                  <div className="flex gap-1 border-b border-stone-200 mb-4">
+                    {product.features && product.features.length > 0 && (
+                      <button
+                        onClick={() => setActiveTab("details")}
+                        className={`px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${
+                          activeTab === "details"
+                            ? "border-b-2 border-stone-900 text-stone-900"
+                            : "text-stone-500 hover:text-stone-700"
+                        }`}
+                      >
+                        Features
+                      </button>
+                    )}
+                    {product.careInstructions && product.careInstructions.length > 0 && (
+                      <button
+                        onClick={() => setActiveTab("care")}
+                        className={`px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${
+                          activeTab === "care"
+                            ? "border-b-2 border-stone-900 text-stone-900"
+                            : "text-stone-500 hover:text-stone-700"
+                        }`}
+                      >
+                        Care
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Tab Content */}
+                  <div className="min-h-[80px]">
+                    {activeTab === "details" && product.features && (
+                      <ul className="text-sm text-stone-600 space-y-1.5">
+                        {product.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-emerald-600 mt-0.5">✓</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {activeTab === "care" && product.careInstructions && (
+                      <ul className="text-sm text-stone-600 space-y-1.5">
+                        {product.careInstructions.map((instruction, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-stone-400">•</span>
+                            <span>{instruction}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Shipping Info */}
+                  {product.shipping && (
+                    <div className="mt-4 pt-4 border-t border-stone-100">
+                      <p className="text-xs text-stone-500 flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        {product.shipping}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Fallback if no detailed info */}
+              {!product.longDescription && !product.features && !product.careInstructions && (
+                <div>
+                  <h4 className="font-medium text-stone-900 mb-3">Product Details</h4>
+                  <ul className="text-sm text-stone-600 space-y-2">
+                    <li>Premium quality materials</li>
+                    <li>Comfortable fit</li>
+                    <li>Machine washable</li>
+                    <li>Back Nine Apparel branding</li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>
