@@ -125,6 +125,89 @@ export async function POST(request: NextRequest) {
       });
 
       console.log(`Notification email sent for order ${orderId}`);
+
+      // Send order confirmation email to customer
+      if (customerEmail) {
+        const orderNumber = orderId.slice(-8).toUpperCase();
+        const itemsHtml = orderItems.map(item =>
+          `<tr>
+            <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4;">
+              <strong>${item.name}</strong><br>
+              <span style="color: #78716c;">Qty: ${item.quantity}</span>
+            </td>
+            <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">$${item.price.toFixed(2)}</td>
+          </tr>`
+        ).join('');
+
+        const shippingHtml = shipping ? `
+          <p style="margin: 0;">
+            ${shipping.name}<br>
+            ${shipping.address?.line1}<br>
+            ${shipping.address?.line2 ? shipping.address.line2 + '<br>' : ''}
+            ${shipping.address?.city}, ${shipping.address?.state} ${shipping.address?.postal_code}
+          </p>
+        ` : '';
+
+        await resend.emails.send({
+          from: "Back Nine Apparel <hello@backnineshop.com>",
+          to: customerEmail,
+          subject: `Order Confirmed! #${orderNumber}`,
+          html: `
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="utf-8"></head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f4;">
+              <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <h1 style="color: #1e3a5f; margin: 0;">Thanks for your order!</h1>
+                  <p style="color: #78716c; margin-top: 10px;">Order #${orderNumber}</p>
+                </div>
+
+                <p>Hey ${customerName || 'there'},</p>
+
+                <p>We've received your order and are getting it ready. You'll receive another email when it ships.</p>
+
+                <div style="background: #fafaf9; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                  <h3 style="margin-top: 0; color: #44403c;">Order Summary</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    ${itemsHtml}
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; color: #78716c;">Subtotal</td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">$${((session.amount_subtotal || 0) / 100).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; color: #78716c;">Shipping</td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">${(session.shipping_cost?.amount_total || 0) === 0 ? 'Free' : '$' + ((session.shipping_cost?.amount_total || 0) / 100).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 12px 0; font-weight: bold;">Total</td>
+                      <td style="padding: 12px 0; text-align: right; font-weight: bold;">$${((session.amount_total || 0) / 100).toFixed(2)}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                ${shipping ? `
+                <div style="margin: 25px 0;">
+                  <h3 style="margin-bottom: 10px; color: #44403c;">Shipping To</h3>
+                  ${shippingHtml}
+                </div>
+                ` : ''}
+
+                <p style="color: #78716c; font-size: 14px; margin-top: 30px;">
+                  Questions about your order? Just reply to this email and we'll help you out.
+                </p>
+
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e7e5e4;">
+                  <a href="https://www.backnineshop.com" style="color: #1e3a5f; text-decoration: none; font-weight: 500;">www.backnineshop.com</a>
+                </div>
+              </div>
+            </body>
+            </html>
+          `,
+        });
+
+        console.log(`Order confirmation email sent to ${customerEmail}`);
+      }
     } catch (error) {
       console.error("Error saving order to database:", error);
       // Return 200 anyway to acknowledge receipt - we don't want Stripe to retry
