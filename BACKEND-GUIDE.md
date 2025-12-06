@@ -175,14 +175,31 @@ src/
 ├── app/
 │   ├── admin/
 │   │   ├── layout.tsx          # Admin auth wrapper
-│   │   └── orders/
-│   │       └── page.tsx        # Orders dashboard
+│   │   ├── dashboard/
+│   │   │   └── page.tsx        # Main dashboard
+│   │   ├── orders/
+│   │   │   └── page.tsx        # Orders management
+│   │   ├── inventory/
+│   │   │   └── page.tsx        # Inventory tracking
+│   │   ├── analytics/
+│   │   │   └── page.tsx        # Analytics & metrics
+│   │   └── errors/
+│   │       └── page.tsx        # Error logs
+│   ├── orders/
+│   │   └── page.tsx            # Customer order tracking
 │   ├── api/
 │   │   ├── admin/
 │   │   │   ├── auth/
 │   │   │   │   └── route.ts    # Password check
+│   │   │   ├── orders/
+│   │   │   │   └── route.ts    # Get all orders
+│   │   │   ├── inventory/
+│   │   │   │   └── route.ts    # Inventory CRUD
 │   │   │   └── ship-order/
 │   │   │       └── route.ts    # Ship & notify
+│   │   ├── orders/
+│   │   │   └── lookup/
+│   │   │       └── route.ts    # Customer order lookup
 │   │   ├── checkout/
 │   │   │   ├── route.ts        # Create Stripe session
 │   │   │   └── session/
@@ -300,7 +317,110 @@ All critical errors are:
 
 ---
 
-## 13. Customer Order Tracking
+## 13. Admin Dashboard
+
+**URL:** `https://www.backnineshop.com/admin/dashboard`
+
+**File:** `src/app/admin/dashboard/page.tsx`
+
+Your central hub for managing the store. Quick overview of everything happening.
+
+**Features:**
+- Revenue stats (today, this week, this month)
+- Order status breakdown (pending, shipped, delivered)
+- Recent orders list with quick actions
+- Top products by revenue
+- Low stock alerts
+- Quick links to all admin pages
+
+### Using the Dashboard
+1. Go to `www.backnineshop.com/admin/dashboard`
+2. See at-a-glance metrics
+3. Click any card to drill into details
+4. Use quick links to navigate to other admin pages
+
+---
+
+## 14. Inventory Management
+
+**URL:** `https://www.backnineshop.com/admin/inventory`
+
+**Files:**
+- `src/app/admin/inventory/page.tsx` - UI
+- `src/app/api/admin/inventory/route.ts` - API
+
+Track stock levels for all products. Get alerts when inventory is low.
+
+**Features:**
+- Stock counts by product/color/size combination
+- Low stock threshold warnings
+- Quick +/- buttons for stock adjustments
+- Filter by: All items, Low Stock, Out of Stock
+- Search products
+- Add new inventory entries
+
+### Database Schema
+
+**Collection:** `inventory`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique inventory ID |
+| `productId` | string | Links to product |
+| `productName` | string | Product display name |
+| `color` | string | Color variant (or empty) |
+| `size` | string | Size (S, M, L, XL, etc.) |
+| `stock` | number | Current quantity |
+| `lowStockThreshold` | number | Alert threshold (default: 5) |
+| `updatedAt` | number | Last update timestamp |
+
+### Managing Inventory
+
+1. Go to `www.backnineshop.com/admin/inventory`
+2. Add items: Click "Add Inventory" → Select product, color, size → Set stock count
+3. Adjust stock: Use +/- buttons or click to edit
+4. View alerts: Yellow = low stock, Red = out of stock
+5. Edit thresholds: Click on item to modify low stock threshold
+
+**Note:** Inventory is tracked separately from orders. Stock is NOT automatically decremented when orders are placed. This is intentional for a new store to allow manual verification before shipping.
+
+---
+
+## 15. Analytics
+
+**URL:** `https://www.backnineshop.com/admin/analytics`
+
+**File:** `src/app/admin/analytics/page.tsx`
+
+Comprehensive store analytics with visual charts and metrics.
+
+**Time Ranges:** 7 days, 30 days, 90 days, All time
+
+### Key Metrics
+- **Total Revenue** - Sum of all orders in period
+- **Total Orders** - Number of orders placed
+- **Average Order Value** - Revenue ÷ Orders
+- **Fulfillment Rate** - % of orders shipped/delivered
+
+### Customer Metrics
+- **Unique Customers** - Distinct email addresses
+- **Repeat Customers** - Customers with 2+ orders
+- **Repeat Rate** - % of customers who reorder
+
+### Charts & Visualizations
+- **Revenue Over Time** - Daily revenue bar chart
+- **Revenue by Day of Week** - See which days perform best
+- **Top Products** - Products ranked by revenue
+- **Orders by Status** - Visual breakdown of order states
+
+### Additional Stats
+- Average items per order
+- Average shipping cost
+- Total shipping revenue
+
+---
+
+## 16. Customer Order Tracking
 
 **URL:** `https://www.backnineshop.com/orders`
 
@@ -320,7 +440,7 @@ Customers can track their orders without logging in:
 
 ---
 
-## 14. GO-LIVE CHECKLIST
+## 17. GO-LIVE CHECKLIST
 
 **IMPORTANT:** The site is currently in TEST MODE. Before accepting real payments, complete these steps:
 
@@ -377,7 +497,10 @@ Customers can track their orders without logging in:
 
 | What | Where |
 |------|-------|
+| Admin dashboard | `backnineshop.com/admin/dashboard` |
 | View orders | `backnineshop.com/admin/orders` |
+| Manage inventory | `backnineshop.com/admin/inventory` |
+| View analytics | `backnineshop.com/admin/analytics` |
 | View errors | `backnineshop.com/admin/errors` |
 | Customer order tracking | `backnineshop.com/orders` |
 | Stripe payments | `dashboard.stripe.com/payments` |
