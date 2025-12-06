@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { Resend } from "resend";
 import { adminDb, tx, id } from "@/lib/instant-admin";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-11-17.clover",
@@ -77,6 +80,51 @@ export async function POST(request: NextRequest) {
       ]);
 
       console.log(`Order ${orderId} saved for session ${session.id}`);
+
+      // Send notification email to you
+      const itemsList = orderItems.map(item =>
+        `• ${item.quantity}x ${item.name} - $${item.price.toFixed(2)}`
+      ).join('\n');
+
+      const shippingText = shipping ?
+        `${shipping.name}\n${shipping.address?.line1}${shipping.address?.line2 ? '\n' + shipping.address.line2 : ''}\n${shipping.address?.city}, ${shipping.address?.state} ${shipping.address?.postal_code}`
+        : 'No shipping address';
+
+      await resend.emails.send({
+        from: "Back Nine Orders <hello@backnineshop.com>",
+        to: "hello@backnineshop.com",
+        subject: `New Order! $${((session.amount_total || 0) / 100).toFixed(2)} from ${customerName || customerEmail}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="utf-8"></head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f4;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px;">
+              <h1 style="color: #1e3a5f; margin-top: 0;">New Order Received!</h1>
+
+              <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 24px; font-weight: bold; color: #059669;">$${((session.amount_total || 0) / 100).toFixed(2)}</p>
+              </div>
+
+              <h3 style="color: #44403c;">Customer</h3>
+              <p>${customerName || 'No name'}<br>${customerEmail}</p>
+
+              <h3 style="color: #44403c;">Ship To</h3>
+              <p style="white-space: pre-line;">${shippingText}</p>
+
+              <h3 style="color: #44403c;">Items</h3>
+              <pre style="background: #fafaf9; padding: 15px; border-radius: 4px; white-space: pre-wrap;">${itemsList}</pre>
+
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e7e5e4;">
+                <a href="https://www.backnineshop.com/admin/orders" style="display: inline-block; background: #1e3a5f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">View Order</a>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+      });
+
+      console.log(`Notification email sent for order ${orderId}`);
     } catch (error) {
       console.error("Error saving order to database:", error);
       // Return 200 anyway to acknowledge receipt - we don't want Stripe to retry

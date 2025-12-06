@@ -32,6 +32,9 @@ interface Order {
   customerEmail: string;
   customerName?: string;
   shippingAddress?: string;
+  trackingNumber?: string;
+  carrier?: string;
+  shippedAt?: number;
   createdAt: number;
 }
 
@@ -46,11 +49,20 @@ export default function AdminOrders() {
   const { isLoading, error, data } = db.useQuery({ orders: {} });
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [showShipModal, setShowShipModal] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [carrier, setCarrier] = useState("USPS");
 
   const orders = (data?.orders || []) as Order[];
   const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
 
   const updateStatus = async (orderId: string, newStatus: string) => {
+    if (newStatus === "shipped" && selectedOrder?.status === "paid") {
+      // Show ship modal instead of directly updating
+      setShowShipModal(true);
+      return;
+    }
+
     setUpdating(true);
     try {
       await db.transact([
@@ -61,6 +73,39 @@ export default function AdminOrders() {
       }
     } catch (err) {
       console.error("Failed to update status:", err);
+    }
+    setUpdating(false);
+  };
+
+  const shipOrder = async () => {
+    if (!selectedOrder) return;
+
+    setUpdating(true);
+    try {
+      const res = await fetch("/api/admin/ship-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          trackingNumber,
+          carrier,
+        }),
+      });
+
+      if (res.ok) {
+        setSelectedOrder({
+          ...selectedOrder,
+          status: "shipped",
+          trackingNumber,
+          carrier,
+        });
+        setShowShipModal(false);
+        setTrackingNumber("");
+      } else {
+        console.error("Failed to ship order");
+      }
+    } catch (err) {
+      console.error("Failed to ship order:", err);
     }
     setUpdating(false);
   };
@@ -202,18 +247,37 @@ export default function AdminOrders() {
                   {/* Status */}
                   <div>
                     <p className="text-xs text-stone-500 uppercase tracking-wide mb-2">Status</p>
-                    <select
-                      value={selectedOrder.status}
-                      onChange={(e) => updateStatus(selectedOrder.id, e.target.value)}
-                      disabled={updating}
-                      className="w-full border border-stone-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900"
-                    >
-                      <option value="paid">Paid</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
+                    {selectedOrder.status === "paid" ? (
+                      <button
+                        onClick={() => setShowShipModal(true)}
+                        disabled={updating}
+                        className="w-full bg-amber-500 text-white rounded px-3 py-2 text-sm font-medium hover:bg-amber-600 transition-colors disabled:opacity-50"
+                      >
+                        Mark as Shipped
+                      </button>
+                    ) : (
+                      <select
+                        value={selectedOrder.status}
+                        onChange={(e) => updateStatus(selectedOrder.id, e.target.value)}
+                        disabled={updating}
+                        className="w-full border border-stone-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900"
+                      >
+                        <option value="paid">Paid</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    )}
                   </div>
+
+                  {/* Tracking Info */}
+                  {selectedOrder.trackingNumber && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                      <p className="text-xs text-amber-800 uppercase tracking-wide mb-1">Tracking</p>
+                      <p className="text-sm font-medium text-amber-900">{selectedOrder.carrier || "USPS"}</p>
+                      <p className="text-sm text-amber-800 font-mono">{selectedOrder.trackingNumber}</p>
+                    </div>
+                  )}
 
                   {/* Customer */}
                   <div>
@@ -312,6 +376,71 @@ export default function AdminOrders() {
           </div>
         </div>
       </div>
+
+      {/* Ship Order Modal */}
+      {showShipModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-stone-900 mb-4">
+              Ship Order #{selectedOrder.id.slice(-8).toUpperCase()}
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-1">
+                  Carrier
+                </label>
+                <select
+                  value={carrier}
+                  onChange={(e) => setCarrier(e.target.value)}
+                  className="w-full border border-stone-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900"
+                >
+                  <option value="USPS">USPS</option>
+                  <option value="UPS">UPS</option>
+                  <option value="FedEx">FedEx</option>
+                  <option value="DHL">DHL</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-1">
+                  Tracking Number (optional)
+                </label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  placeholder="Enter tracking number"
+                  className="w-full border border-stone-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900"
+                />
+              </div>
+
+              <p className="text-sm text-stone-500">
+                The customer will receive an email notification with the tracking info.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowShipModal(false);
+                  setTrackingNumber("");
+                }}
+                className="flex-1 border border-stone-200 rounded px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={shipOrder}
+                disabled={updating}
+                className="flex-1 bg-amber-500 text-white rounded px-4 py-2 text-sm font-medium hover:bg-amber-600 disabled:opacity-50"
+              >
+                {updating ? "Sending..." : "Ship & Notify Customer"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
