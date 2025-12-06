@@ -300,4 +300,97 @@ All critical errors are:
 
 ---
 
+## 13. Customer Order Tracking
+
+**URL:** `https://www.backnineshop.com/orders`
+
+Customers can track their orders without logging in:
+
+1. Enter email address used for order
+2. Enter order number (8-character code from confirmation email)
+3. View order status, items, tracking info
+
+**Features:**
+- Visual progress tracker (Order Placed → Shipped → Delivered)
+- Direct links to carrier tracking (USPS, UPS, FedEx, DHL)
+- Full order details and shipping address
+- Auto-lookup when clicking "Track Your Order" from email
+
+**Link in footer:** "Order Status" under Help section
+
+---
+
+## 14. GO-LIVE CHECKLIST
+
+**IMPORTANT:** The site is currently in TEST MODE. Before accepting real payments, complete these steps:
+
+### Step 1: Activate Stripe Account
+1. Go to https://dashboard.stripe.com
+2. Click "Activate your account" or complete the banner prompts
+3. Fill in:
+   - Business details (Back Nine Apparel)
+   - Personal details (name, DOB, address, SSN for tax purposes)
+   - Bank account for payouts
+4. Wait for Stripe verification (usually instant, sometimes 1-2 days)
+
+### Step 2: Create Live Webhook
+1. In Stripe Dashboard, switch toggle from "Test mode" to "Live mode" (top right)
+2. Go to Developers → Webhooks
+3. Click "Add endpoint"
+4. Enter URL: `https://www.backnineshop.com/api/webhooks/stripe`
+5. Select event: `checkout.session.completed`
+6. Click "Add endpoint"
+7. Copy the **Signing secret** (starts with `whsec_`)
+
+### Step 3: Update Vercel Environment Variables
+1. Go to https://vercel.com/7layerlabs-projects/backnine/settings/environment-variables
+2. Update `STRIPE_WEBHOOK_SECRET` with the new Live signing secret
+3. Verify `STRIPE_SECRET_KEY` is the Live key (starts with `sk_live_`)
+4. Verify `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is the Live key (starts with `pk_live_`)
+5. Click "Save"
+
+### Step 4: Redeploy
+1. Go to Deployments tab in Vercel
+2. Click "..." on latest deployment → "Redeploy"
+3. Wait for deployment to complete
+
+### Step 5: Test Live Payment
+1. Make a real $1 test purchase (you can refund it)
+2. Verify order appears in `/admin/orders`
+3. Verify you receive email notification
+4. Verify customer receives confirmation email
+5. Refund the test order in Stripe Dashboard
+
+### Post-Launch Checklist
+- [ ] Stripe account activated
+- [ ] Live webhook created
+- [ ] Vercel env vars updated with Live keys
+- [ ] Site redeployed
+- [ ] Test purchase successful
+- [ ] Order notification email received
+- [ ] Customer confirmation email received
+- [ ] Test order refunded
+
+---
+
+## Quick Reference
+
+| What | Where |
+|------|-------|
+| View orders | `backnineshop.com/admin/orders` |
+| View errors | `backnineshop.com/admin/errors` |
+| Customer order tracking | `backnineshop.com/orders` |
+| Stripe payments | `dashboard.stripe.com/payments` |
+| Vercel deployments | `vercel.com/7layerlabs-projects/backnine` |
+| InstantDB data | Your InstantDB dashboard |
+| Email logs | Resend dashboard |
+
+| Login | Credential |
+|-------|------------|
+| Admin panel | `ADMIN_PASSWORD` env var |
+| Stripe | Your Stripe account |
+| Vercel | GitHub (7LayerLabs) |
+
+---
+
 *Last updated: December 6, 2025*
