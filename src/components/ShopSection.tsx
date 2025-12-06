@@ -48,26 +48,26 @@ export default function ShopSection() {
   };
 
   return (
-    <section id="shop" className="py-20 bg-stone-50">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <span className="text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">
+    <section id="shop" className="py-12 sm:py-20 bg-stone-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="text-xs sm:text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">
             The Lineup
           </span>
-          <h2 className="text-3xl md:text-4xl font-montserrat font-bold tracking-wide text-stone-900 mt-2 uppercase">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-montserrat font-bold tracking-wide text-stone-900 mt-2 uppercase">
             Gear Up
           </h2>
-          <p className="text-stone-600 mt-4 max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-stone-600 mt-3 sm:mt-4 max-w-xl mx-auto px-4">
             Clean fits that work on the course and after. No country club vibes - just good gear.
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
           {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setFilter(cat.value, null)}
-              className={`px-6 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium transition-colors ${
                 activeCategory === cat.value && !subFilter
                   ? "bg-stone-900 text-white"
                   : "bg-white text-stone-700 hover:bg-stone-100"
@@ -78,7 +78,7 @@ export default function ShopSection() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8">
           {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}

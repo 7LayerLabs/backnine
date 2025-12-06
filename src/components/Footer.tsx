@@ -3,19 +3,19 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-stone-900 text-white py-16">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
+    <footer className="bg-stone-900 text-white py-12 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
+          <div className="space-y-4 col-span-2 md:col-span-1">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Image
                 src="/logo.jpeg"
                 alt="Back Nine Apparel"
-                width={50}
-                height={50}
-                className="rounded"
+                width={40}
+                height={40}
+                className="rounded sm:w-[50px] sm:h-[50px]"
               />
-              <h3 className="text-xl font-bold tracking-wide font-montserrat">BACK NINE</h3>
+              <h3 className="text-lg sm:text-xl font-bold tracking-wide font-montserrat">BACK NINE</h3>
             </div>
             <p className="text-stone-400 text-sm leading-relaxed">
               Golf gear for guys who play hard and look good doing it.

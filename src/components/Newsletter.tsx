@@ -41,15 +41,15 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="py-20 bg-stone-900">
-      <div className="max-w-2xl mx-auto px-6 text-center">
-        <span className="text-sm tracking-[0.3em] text-stone-400 uppercase font-montserrat">
+    <section className="py-12 sm:py-20 bg-stone-900">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+        <span className="text-xs sm:text-sm tracking-[0.3em] text-stone-400 uppercase font-montserrat">
           Get In
         </span>
-        <h2 className="text-3xl font-montserrat font-bold tracking-wide text-white mt-2 mb-4 uppercase">
+        <h2 className="text-2xl sm:text-3xl font-montserrat font-bold tracking-wide text-white mt-2 mb-3 sm:mb-4 uppercase">
           Join the Crew
         </h2>
-        <p className="text-stone-400 mb-8">
+        <p className="text-sm sm:text-base text-stone-400 mb-6 sm:mb-8 px-2">
           First dibs on new drops, exclusive deals, and 10% off your first order. No spam, just the good stuff.
         </p>
         {isSubmitted ? (
@@ -66,12 +66,12 @@ export default function Newsletter() {
                 placeholder="Enter your email"
                 required
                 disabled={isLoading}
-                className="flex-1 px-6 py-4 bg-stone-800 text-white placeholder-stone-500 border border-stone-700 focus:outline-none focus:border-stone-500 disabled:opacity-50"
+                className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-stone-800 text-white placeholder-stone-500 border border-stone-700 focus:outline-none focus:border-stone-500 disabled:opacity-50 text-sm sm:text-base"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-8 py-4 bg-white text-stone-900 font-medium hover:bg-stone-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-stone-900 font-medium hover:bg-stone-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {isLoading ? "Subscribing..." : "Subscribe"}
               </button>

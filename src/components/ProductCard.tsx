@@ -39,7 +39,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
   return (
     <div className="group h-full flex flex-col">
-      <div className="relative aspect-square overflow-hidden bg-stone-100 mb-4">
+      <div className="relative aspect-square overflow-hidden bg-stone-100 mb-2 sm:mb-4">
         <Image
           src={currentImage}
           alt={product.name}
@@ -67,11 +67,11 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         </div>
       </div>
       <div className="flex flex-col flex-grow">
-        <h3 className="font-medium text-stone-900">{product.name}</h3>
-        <p className="text-sm text-stone-500 mt-2">{product.description}</p>
+        <h3 className="font-medium text-stone-900 text-sm sm:text-base leading-tight">{product.name}</h3>
+        <p className="text-xs sm:text-sm text-stone-500 mt-1 sm:mt-2 hidden sm:block">{product.description}</p>
 
         {/* Color Swatches */}
-        <div className="h-8 flex items-center gap-1.5 mt-2">
+        <div className="h-6 sm:h-8 flex items-center gap-1 sm:gap-1.5 mt-1 sm:mt-2">
           {product.colors && product.colors.length > 0 ? (
             <>
               {product.colors.slice(0, maxVisibleColors).map((color) => (
@@ -79,7 +79,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                   key={color.name}
                   onClick={() => setSelectedColor(color)}
                   title={color.name}
-                  className={`w-5 h-5 rounded-full border-2 transition-all ${
+                  className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 transition-all ${
                     selectedColor?.name === color.name
                       ? "border-stone-900 scale-110"
                       : "border-stone-300 hover:border-stone-500"
@@ -96,11 +96,11 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           ) : null}
         </div>
 
-        <div className="mt-auto pt-2">
-          <p className="font-semibold text-stone-900 mb-2">${product.price.toFixed(2)}</p>
+        <div className="mt-auto pt-1 sm:pt-2">
+          <p className="font-semibold text-stone-900 text-sm sm:text-base mb-1 sm:mb-2">${product.price.toFixed(2)}</p>
           <button
             onClick={handleAddToCart}
-            className={`w-full py-3 text-sm font-medium transition-colors ${
+            className={`w-full py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
               isAdded
                 ? "bg-emerald-600 text-white"
                 : "bg-stone-900 text-white hover:bg-stone-800"

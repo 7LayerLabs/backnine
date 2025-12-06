@@ -51,10 +51,10 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="text-center">
-              <span className="block text-xl font-bold tracking-[0.2em] font-montserrat text-white">
+              <span className="block text-base sm:text-xl font-bold tracking-[0.15em] sm:tracking-[0.2em] font-montserrat text-white">
                 BACK NINE
               </span>
-              <span className="block text-xs tracking-[0.3em] uppercase text-white/80">
+              <span className="block text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] uppercase text-white/80">
                 Apparel
               </span>
             </div>

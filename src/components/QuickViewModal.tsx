@@ -66,16 +66,16 @@ export default function QuickViewModal({
       onClick={onClose}
     >
       <div
-        className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto relative"
+        className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto relative mx-2 sm:mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-3xl text-stone-400 hover:text-stone-600"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 text-2xl sm:text-3xl text-stone-400 hover:text-stone-600 bg-white/80 rounded-full w-8 h-8 sm:w-auto sm:h-auto flex items-center justify-center"
         >
           &times;
         </button>
-        <div className="grid md:grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="relative aspect-square bg-stone-100">
             <Image
               src={currentImage}
@@ -84,7 +84,7 @@ export default function QuickViewModal({
               className="object-cover"
             />
           </div>
-          <div className="p-8 flex flex-col">
+          <div className="p-5 sm:p-8 flex flex-col">
             <h2 className="text-2xl font-semibold text-stone-900 mb-2">
               {product.name}
             </h2>
@@ -121,12 +121,12 @@ export default function QuickViewModal({
               <label className="block text-sm font-medium text-stone-700 mb-2">
                 Size
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 text-sm font-medium transition-colors ${
+                    className={`w-10 h-10 sm:w-12 sm:h-12 text-xs sm:text-sm font-medium transition-colors ${
                       selectedSize === size
                         ? "bg-stone-900 text-white"
                         : "bg-stone-100 text-stone-700 hover:bg-stone-200"
