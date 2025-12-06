@@ -104,6 +104,11 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Help</h4>
             <ul className="space-y-2 text-stone-400">
               <li>
+                <Link href="/orders" className="hover:text-white transition-colors">
+                  Order Status
+                </Link>
+              </li>
+              <li>
                 <Link href="/shipping" className="hover:text-white transition-colors">
                   Shipping
                 </Link>

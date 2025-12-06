@@ -199,6 +199,10 @@ export async function POST(request: NextRequest) {
                 </div>
                 ` : ''}
 
+                <div style="text-align: center; margin-top: 30px;">
+                  <a href="https://www.backnineshop.com/orders?email=${encodeURIComponent(customerEmail)}&order=${orderNumber}" style="display: inline-block; background: #1e3a5f; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 500;">Track Your Order</a>
+                </div>
+
                 <p style="color: #78716c; font-size: 14px; margin-top: 30px;">
                   Questions about your order? Just reply to this email and we'll help you out.
                 </p>
