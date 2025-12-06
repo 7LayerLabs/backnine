@@ -12,6 +12,7 @@ interface CartItem {
   price: number;
   quantity: number;
   size: string;
+  color?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
         currency: "usd",
         product_data: {
           name: item.productName,
-          description: `Size: ${item.size}`,
+          description: `Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ""}`,
           images: [item.productImage.startsWith("http")
             ? item.productImage
             : `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002"}${item.productImage}`

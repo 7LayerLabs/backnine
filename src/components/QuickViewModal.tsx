@@ -2,21 +2,31 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Product } from "./ProductCard";
+import { Product, ColorVariant } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
 interface QuickViewModalProps {
   product: Product;
+  initialColor?: ColorVariant;
   onClose: () => void;
 }
 
 const sizes = ["S", "M", "L", "XL", "XXL"];
 
-export default function QuickViewModal({ product, onClose }: QuickViewModalProps) {
+export default function QuickViewModal({ 
+  product, 
+  initialColor, 
+  onClose 
+}: QuickViewModalProps) {
   const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(
+    initialColor ?? product.colors?.[0]
+  );
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const { addItem } = useCart();
+
+  const currentImage = selectedColor?.image ?? product.image;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -37,10 +47,11 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
     addItem({
       productId: product.id,
       productName: product.name,
-      productImage: product.image,
+      productImage: currentImage,
       price: product.price,
       quantity: quantity,
       size: selectedSize,
+      color: selectedColor?.name,
     });
     setIsAdded(true);
     setTimeout(() => {
@@ -67,7 +78,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
         <div className="grid md:grid-cols-2">
           <div className="relative aspect-square bg-stone-100">
             <Image
-              src={product.image}
+              src={currentImage}
               alt={product.name}
               fill
               className="object-cover"
@@ -81,6 +92,30 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             <p className="text-2xl font-semibold text-stone-900 mb-6">
               ${product.price.toFixed(2)}
             </p>
+
+            {/* Color Selection */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-stone-700 mb-2">
+                  Color: {selectedColor?.name}
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color.name}
+                      onClick={() => setSelectedColor(color)}
+                      title={color.name}
+                      className={`w-8 h-8 rounded-full border-2 transition-all ${
+                        selectedColor?.name === color.name
+                          ? "border-stone-900 scale-110 ring-2 ring-stone-900 ring-offset-2"
+                          : "border-stone-300 hover:border-stone-500"
+                      }`}
+                      style={{ backgroundColor: color.hex }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-stone-700 mb-2">

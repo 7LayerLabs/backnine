@@ -12,6 +12,7 @@ interface CartItem {
   price: number;
   quantity: number;
   size: string;
+  color?: string;
 }
 
 interface CartContextType {
@@ -33,9 +34,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const items = (data?.cartItems ?? []) as CartItem[];
 
   const addItem = (item: Omit<CartItem, "id">) => {
-    // Check if item already exists with same productId and size
+    // Check if item already exists with same productId, size, and color
     const existingItem = items.find(
-      (i) => i.productId === item.productId && i.size === item.size
+      (i) => 
+        i.productId === item.productId && 
+        i.size === item.size &&
+        i.color === item.color
     );
 
     if (existingItem) {

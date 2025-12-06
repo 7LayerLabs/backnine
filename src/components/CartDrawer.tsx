@@ -110,7 +110,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <h3 className="font-medium text-stone-900">
                       {item.productName}
                     </h3>
-                    <p className="text-sm text-stone-500">Size: {item.size}</p>
+                    <p className="text-sm text-stone-500">
+                      Size: {item.size}
+                      {item.color && ` | ${item.color}`}
+                    </p>
                     <p className="text-sm font-medium text-stone-900">
                       ${item.price.toFixed(2)}
                     </p>

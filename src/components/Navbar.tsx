@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { useShopFilter, Category, SubFilter } from "@/context/ShopFilterContext";
 import { db } from "@/lib/instant";
 import AuthModal from "./AuthModal";
 import CartDrawer from "./CartDrawer";
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { itemCount } = useCart();
+  const { setFilter } = useShopFilter();
 
   // Get auth state from InstantDB
   const { user } = db.useAuth();
@@ -27,6 +29,16 @@ export default function Navbar() {
 
   const handleSignOut = () => {
     db.auth.signOut();
+  };
+
+  const handleNavClick = (category: Category, subFilter: SubFilter = null) => {
+    setFilter(category, subFilter);
+    setIsMobileMenuOpen(false);
+    // Smooth scroll to shop section
+    const shopSection = document.getElementById("shop");
+    if (shopSection) {
+      shopSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -49,11 +61,11 @@ export default function Navbar() {
           </Link>
 
           <ul className="hidden md:flex items-center gap-8 text-white">
-            <li><Link href="#shop" className="text-sm font-medium hover:opacity-70 transition-opacity">New Arrivals</Link></li>
-            <li><Link href="#shop" className="text-sm font-medium hover:opacity-70 transition-opacity">Polos</Link></li>
-            <li><Link href="#shop" className="text-sm font-medium hover:opacity-70 transition-opacity">Hoodies & Crews</Link></li>
-            <li><Link href="#shop" className="text-sm font-medium hover:opacity-70 transition-opacity">Headwear</Link></li>
-            <li><Link href="#shop" className="text-sm font-medium hover:opacity-70 transition-opacity">Accessories</Link></li>
+            <li><button onClick={() => handleNavClick("all")} className="text-sm font-medium hover:opacity-70 transition-opacity">All Products</button></li>
+            <li><button onClick={() => handleNavClick("tops", "polos")} className="text-sm font-medium hover:opacity-70 transition-opacity">Polos</button></li>
+            <li><button onClick={() => handleNavClick("tops", "hoodies")} className="text-sm font-medium hover:opacity-70 transition-opacity">Hoodies & Crews</button></li>
+            <li><button onClick={() => handleNavClick("headwear")} className="text-sm font-medium hover:opacity-70 transition-opacity">Headwear</button></li>
+            <li><button onClick={() => handleNavClick("accessories")} className="text-sm font-medium hover:opacity-70 transition-opacity">Accessories</button></li>
             <li><Link href="#our-story" className="text-sm font-medium hover:opacity-70 transition-opacity">Our Story</Link></li>
           </ul>
 
@@ -145,12 +157,12 @@ export default function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-[#1e3a5f] absolute top-full left-0 right-0 border-t border-white/10">
             <ul className="flex flex-col py-4">
-              <li><Link href="#shop" className="block px-6 py-3 text-white hover:bg-white/10">New Arrivals</Link></li>
-              <li><Link href="#shop" className="block px-6 py-3 text-white hover:bg-white/10">Polos</Link></li>
-              <li><Link href="#shop" className="block px-6 py-3 text-white hover:bg-white/10">Hoodies & Crews</Link></li>
-              <li><Link href="#shop" className="block px-6 py-3 text-white hover:bg-white/10">Headwear</Link></li>
-              <li><Link href="#shop" className="block px-6 py-3 text-white hover:bg-white/10">Accessories</Link></li>
-              <li><Link href="#our-story" className="block px-6 py-3 text-white hover:bg-white/10">Our Story</Link></li>
+              <li><button onClick={() => handleNavClick("all")} className="block w-full text-left px-6 py-3 text-white hover:bg-white/10">All Products</button></li>
+              <li><button onClick={() => handleNavClick("tops", "polos")} className="block w-full text-left px-6 py-3 text-white hover:bg-white/10">Polos</button></li>
+              <li><button onClick={() => handleNavClick("tops", "hoodies")} className="block w-full text-left px-6 py-3 text-white hover:bg-white/10">Hoodies & Crews</button></li>
+              <li><button onClick={() => handleNavClick("headwear")} className="block w-full text-left px-6 py-3 text-white hover:bg-white/10">Headwear</button></li>
+              <li><button onClick={() => handleNavClick("accessories")} className="block w-full text-left px-6 py-3 text-white hover:bg-white/10">Accessories</button></li>
+              <li><Link href="#our-story" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3 text-white hover:bg-white/10">Our Story</Link></li>
               {user ? (
                 <li>
                   <button onClick={handleSignOut} className="block w-full text-left px-6 py-3 text-white hover:bg-white/10">

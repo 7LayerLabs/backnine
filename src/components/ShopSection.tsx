@@ -1,129 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import ProductCard, { Product } from "./ProductCard";
+import ProductCard from "./ProductCard";
 import QuickViewModal from "./QuickViewModal";
-
-const products: Product[] = [
-  {
-    id: "1",
-    name: "Classic Crewneck",
-    description: "Premium cotton blend sweatshirt",
-    price: 65.0,
-    image: "/apparel/b9_sweatshirt.jpeg",
-    category: "tops",
-  },
-  {
-    id: "2",
-    name: "Classic Hoodie",
-    description: "Comfortable pullover hoodie",
-    price: 75.0,
-    image: "/apparel/marketing/b9mkt6.png",
-    category: "tops",
-    badge: "Bestseller",
-  },
-  {
-    id: "3",
-    name: "Par-Tee Time Hoodie",
-    description: "Light blue pullover hoodie",
-    price: 75.0,
-    image: "/apparel/marketing/b9_mkt2.png",
-    category: "tops",
-    badge: "New",
-  },
-  {
-    id: "4",
-    name: "Classic Tee",
-    description: "Soft cotton comfort colors tee",
-    price: 35.0,
-    image: "/apparel/b9_tshirt.jpeg",
-    category: "tops",
-  },
-  {
-    id: "5",
-    name: "Navy Rope Hat",
-    description: "Classic rope snapback",
-    price: 38.0,
-    image: "/apparel/b9_cap3.jpeg",
-    category: "headwear",
-  },
-  {
-    id: "6",
-    name: "Black Rope Hat - Teal",
-    description: "Classic rope snapback",
-    price: 38.0,
-    image: "/apparel/b9_cap5.jpeg",
-    category: "headwear",
-    badge: "Bestseller",
-  },
-  {
-    id: "7",
-    name: "White Rope Hat - Green",
-    description: "Classic rope snapback",
-    price: 38.0,
-    image: "/apparel/b9_cap1.jpeg",
-    category: "headwear",
-  },
-  {
-    id: "8",
-    name: "White Rope Hat - Blue",
-    description: "Classic rope snapback",
-    price: 38.0,
-    image: "/apparel/b9_cap2.jpeg",
-    category: "headwear",
-  },
-  {
-    id: "9",
-    name: "Navy Rope Hat - Sunset",
-    description: "Classic rope snapback",
-    price: 38.0,
-    image: "/apparel/b9_cap4.jpeg",
-    category: "headwear",
-  },
-  {
-    id: "10",
-    name: "Black Rope Hat - Gold",
-    description: "Classic rope snapback",
-    price: 38.0,
-    image: "/apparel/b9_cap6.jpeg",
-    category: "headwear",
-  },
-  {
-    id: "11",
-    name: "Black Pom Beanie",
-    description: "Warm knit beanie with pom",
-    price: 32.0,
-    image: "/apparel/b9_wintercap.jpeg",
-    category: "headwear",
-    badge: "New",
-  },
-  {
-    id: "12",
-    name: "Golf Towel",
-    description: "Microfiber waffle towel with clip",
-    price: 24.0,
-    image: "/apparel/b9_golftowel.jpeg",
-    category: "accessories",
-  },
-];
-
-type Category = "all" | "tops" | "headwear" | "accessories";
+import { products, Product, ColorVariant } from "@/data/products";
+import { useShopFilter, Category } from "@/context/ShopFilterContext";
 
 export default function ShopSection() {
-  const [activeCategory, setActiveCategory] = useState<Category>("all");
+  const { activeCategory, subFilter, setFilter } = useShopFilter();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(undefined);
 
-  const filteredProducts =
-    activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
+  // Filter products by category and sub-filter
+  const filteredProducts = products.filter((p) => {
+    // First filter by category
+    if (activeCategory !== "all" && p.category !== activeCategory) {
+      return false;
+    }
 
+    // Then apply sub-filter if set
+    if (subFilter === "polos") {
+      return p.id === "polo";
+    }
+    if (subFilter === "hoodies") {
+      return p.id === "classic-hoodie" || p.id === "par-tee-hoodie" || p.id === "crewneck-sweatshirt";
+    }
+
+    return true;
+  });
+
+  // Categories in order: All, Headwear, Tops, Accessories
   const categories: { value: Category; label: string }[] = [
     { value: "all", label: "All" },
-    { value: "tops", label: "Tops" },
     { value: "headwear", label: "Headwear" },
+    { value: "tops", label: "Tops" },
     { value: "accessories", label: "Accessories" },
   ];
+
+  const handleQuickView = (product: Product, color?: ColorVariant) => {
+    setSelectedProduct(product);
+    setSelectedColor(color);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+    setSelectedColor(undefined);
+  };
 
   return (
     <section id="shop" className="py-20 bg-stone-50">
@@ -136,7 +58,7 @@ export default function ShopSection() {
             Gear Up
           </h2>
           <p className="text-stone-600 mt-4 max-w-xl mx-auto">
-            Clean fits that work on the course and after. No country club vibes — just good gear.
+            Clean fits that work on the course and after. No country club vibes - just good gear.
           </p>
         </div>
 
@@ -144,9 +66,9 @@ export default function ShopSection() {
           {categories.map((cat) => (
             <button
               key={cat.value}
-              onClick={() => setActiveCategory(cat.value)}
+              onClick={() => setFilter(cat.value, null)}
               className={`px-6 py-2 text-sm font-medium transition-colors ${
-                activeCategory === cat.value
+                activeCategory === cat.value && !subFilter
                   ? "bg-stone-900 text-white"
                   : "bg-white text-stone-700 hover:bg-stone-100"
               }`}
@@ -161,7 +83,7 @@ export default function ShopSection() {
             <ProductCard
               key={product.id}
               product={product}
-              onQuickView={setSelectedProduct}
+              onQuickView={handleQuickView}
             />
           ))}
         </div>
@@ -170,7 +92,8 @@ export default function ShopSection() {
       {selectedProduct && (
         <QuickViewModal
           product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          initialColor={selectedColor}
+          onClose={handleCloseModal}
         />
       )}
     </section>
