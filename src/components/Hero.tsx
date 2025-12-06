@@ -6,16 +6,16 @@ export default function Hero() {
     <section id="home" className="min-h-screen bg-white flex items-center relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-24 sm:py-20 w-full">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="space-y-4 sm:space-y-6 order-2 md:order-1">
+          <div className="space-y-4 sm:space-y-6 order-2 md:order-1 text-center md:text-left">
             <p className="text-xs sm:text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">Est. 2025</p>
             <h1 className="font-montserrat text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-stone-900 font-bold tracking-wide">
               BACK NINE
               <span className="block text-emerald-700">APPAREL</span>
             </h1>
-            <p className="text-base sm:text-lg text-stone-600 max-w-md font-inter leading-relaxed">
+            <p className="text-base sm:text-lg text-stone-600 max-w-md mx-auto md:mx-0 font-inter leading-relaxed">
               Golf gear that goes from the course to the clubhouse. Look good. Play better. Finish strong.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4 items-center md:items-start">
               <Link
                 href="#shop"
                 className="inline-block bg-stone-900 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm font-medium tracking-wide hover:bg-stone-800 transition-colors text-center"
