@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { adminDb, tx } from "@/lib/instant-admin";
+import { logError } from "@/lib/error-logger";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -107,7 +108,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Ship order error:", error);
+    await logError({
+      error,
+      context: "ship-order",
+      severity: "high",
+      metadata: { stage: "update-and-notify" },
+    });
     return NextResponse.json(
       { error: "Failed to update order" },
       { status: 500 }

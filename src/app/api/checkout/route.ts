@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { logError } from "@/lib/error-logger";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-11-17.clover",
@@ -100,7 +101,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    console.error("Stripe checkout error:", error);
+    await logError({
+      error,
+      context: "checkout",
+      severity: "high",
+      metadata: { stage: "create-session" },
+    });
     return NextResponse.json(
       { error: "Failed to create checkout session" },
       { status: 500 }

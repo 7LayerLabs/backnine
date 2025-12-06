@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Resend } from "resend";
 import { adminDb, tx, id } from "@/lib/instant-admin";
+import { logError } from "@/lib/error-logger";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -20,7 +21,12 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error("Webhook signature verification failed:", err);
+    await logError({
+      error: err,
+      context: "stripe-webhook",
+      severity: "critical",
+      metadata: { stage: "signature-verification" },
+    });
     return NextResponse.json(
       { error: "Webhook signature verification failed" },
       { status: 400 }
@@ -209,9 +215,19 @@ export async function POST(request: NextRequest) {
         console.log(`Order confirmation email sent to ${customerEmail}`);
       }
     } catch (error) {
-      console.error("Error saving order to database:", error);
+      await logError({
+        error,
+        context: "stripe-webhook",
+        severity: "critical",
+        metadata: {
+          stage: "order-save",
+          sessionId: session.id,
+          paymentIntent: session.payment_intent,
+          customerEmail: session.customer_details?.email,
+        },
+      });
       // Return 200 anyway to acknowledge receipt - we don't want Stripe to retry
-      // Log the error for manual investigation
+      // Error logged for manual investigation
     }
   }
 

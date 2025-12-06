@@ -143,6 +143,11 @@ When you click "Mark as Shipped":
 
 **Sent from:** `hello@backnineshop.com` (via Resend)
 
+### Order Confirmation Email (to customer)
+- **When:** Immediately after payment succeeds
+- **Subject:** "Order Confirmed! #XXXXXXXX"
+- **Contains:** Order number, items with prices, subtotal/shipping/total, shipping address, friendly message
+
 ### New Order Email (to you)
 - **When:** Customer completes payment
 - **Subject:** "New Order! $XX.XX from [Customer Name]"
@@ -239,7 +244,44 @@ src/
 
 ---
 
-## 11. Troubleshooting
+## 11. Error Logging
+
+**URL:** `https://www.backnineshop.com/admin/errors`
+
+**File:** `src/lib/error-logger.ts`
+
+All critical errors are:
+1. Logged to console (Vercel function logs)
+2. Saved to InstantDB `errors` collection
+3. Emailed to `hello@backnineshop.com` for critical severity
+
+### Error Severity Levels
+
+| Level | When Used | Email? |
+|-------|-----------|--------|
+| `low` | Minor issues, logging only | No |
+| `medium` | Recoverable errors | No |
+| `high` | Failed operations (checkout, shipping) | No |
+| `critical` | Payment failures, webhook errors | Yes |
+
+### Viewing Errors
+
+1. Go to `www.backnineshop.com/admin/errors`
+2. Filter by: Unresolved, All, or Resolved
+3. Click error to see full details, stack trace, context
+4. Mark as resolved or delete when fixed
+
+### Key Error Contexts
+
+| Context | What It Means |
+|---------|---------------|
+| `stripe-webhook` | Payment processing failed |
+| `checkout` | Checkout session creation failed |
+| `ship-order` | Shipping update/notification failed |
+
+---
+
+## 12. Troubleshooting
 
 ### Orders not appearing?
 - Check Stripe webhook is active in dashboard

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { db } from "@/lib/instant";
 
 interface OrderItem {
@@ -158,8 +159,16 @@ export default function AdminOrders() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-stone-900">Orders</h1>
-          <div className="text-sm text-stone-500">
-            {orders.length} total order{orders.length !== 1 ? "s" : ""}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/errors"
+              className="text-sm text-stone-500 hover:text-stone-900"
+            >
+              Error Log &rarr;
+            </Link>
+            <div className="text-sm text-stone-500">
+              {orders.length} total order{orders.length !== 1 ? "s" : ""}
+            </div>
           </div>
         </div>
 
