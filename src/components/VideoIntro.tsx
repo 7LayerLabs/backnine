@@ -12,7 +12,7 @@ export default function VideoIntro() {
         loop
         playsInline
       >
-        <source src="/golfview.mov" type="video/mp4" />
+        <source src="/golfview.mp4" type="video/mp4" />
       </video>
       <Link
         href="#home"
