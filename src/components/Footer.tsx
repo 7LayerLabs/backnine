@@ -104,22 +104,22 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Help</h4>
             <ul className="space-y-2 text-stone-400">
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/shipping" className="hover:text-white transition-colors">
                   Shipping
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/returns" className="hover:text-white transition-colors">
                   Returns
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/size-guide" className="hover:text-white transition-colors">
                   Size Guide
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/faq" className="hover:text-white transition-colors">
                   FAQ
                 </Link>
               </li>
