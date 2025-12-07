@@ -440,7 +440,85 @@ Customers can track their orders without logging in:
 
 ---
 
-## 17. GO-LIVE CHECKLIST
+## 17. Abandoned Cart Recovery
+
+**Files:**
+- `src/app/api/cart/save/route.ts` - Save/retrieve carts
+- `src/app/api/cron/abandoned-cart/route.ts` - Hourly email sender
+- `src/app/cart/recover/page.tsx` - Cart recovery page
+- `src/components/CartDrawer.tsx` - Email capture at checkout
+
+Automatically recover lost sales by emailing customers who abandon checkout.
+
+### How It Works
+
+1. **Email Capture:** When customer clicks "Checkout", they enter their email first
+2. **Cart Saved:** Cart items saved to InstantDB with email and recovery token
+3. **Checkout:** Customer proceeds to Stripe payment
+4. **Recovery Emails:** If checkout not completed, automated emails sent:
+   - Email 1: 1 hour after abandonment
+   - Email 2: 24 hours after abandonment
+   - Email 3: 72 hours after abandonment (last chance)
+5. **Recovery:** Customer clicks link → Cart restored → Continues shopping
+6. **Completed:** When payment succeeds, cart marked as "recovered"
+
+### Database Schema
+
+**Collection:** `abandonedCarts`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique cart ID |
+| `email` | string | Customer email |
+| `items` | string | JSON array of cart items |
+| `total` | number | Cart subtotal |
+| `recoveryToken` | string | Unique recovery link token |
+| `recovered` | boolean | Whether order was completed |
+| `emailsSent` | number | Count of emails sent (0-3) |
+| `lastEmailSent` | number | Timestamp of last email |
+| `createdAt` | number | When cart was abandoned |
+
+### Required Environment Variable
+
+Add to Vercel:
+- `CRON_SECRET` - Random string to secure the cron endpoint
+
+### Cron Job
+
+Configured in `vercel.json`:
+```json
+{
+  "crons": [
+    {
+      "path": "/api/cron/abandoned-cart",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
+```
+
+Runs every hour to check for abandoned carts and send recovery emails.
+
+### Recovery Flow
+
+1. Customer receives email with "Complete Your Order" button
+2. Clicks link → `backnineshop.com/cart/recover?token=xxx`
+3. Sees their saved items
+4. Clicks "Restore Cart" → Items added to cart
+5. Redirected to homepage to continue checkout
+
+### Email Templates
+
+Three emails with progressive urgency:
+- **Email 1:** "You left something behind..." - Friendly reminder
+- **Email 2:** "Your cart is waiting for you" - Items selling fast
+- **Email 3:** "Last chance to complete your order" - Cart expires soon
+
+All emails match Back Nine brand (stone colors, clean design).
+
+---
+
+## 18. GO-LIVE CHECKLIST
 
 **IMPORTANT:** The site is currently in TEST MODE. Before accepting real payments, complete these steps:
 
@@ -485,11 +563,13 @@ Customers can track their orders without logging in:
 - [ ] Stripe account activated
 - [ ] Live webhook created
 - [ ] Vercel env vars updated with Live keys
+- [ ] `CRON_SECRET` env var added (random string for abandoned cart cron)
 - [ ] Site redeployed
 - [ ] Test purchase successful
 - [ ] Order notification email received
 - [ ] Customer confirmation email received
 - [ ] Test order refunded
+- [ ] Abandoned cart recovery emails working (test by abandoning checkout)
 
 ---
 

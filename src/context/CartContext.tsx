@@ -21,6 +21,7 @@ interface CartContextType {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  restoreCart: (items: Omit<CartItem, "id">[]) => void;
   total: number;
   itemCount: number;
 }
@@ -73,6 +74,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const restoreCart = (newItems: Omit<CartItem, "id">[]) => {
+    // Clear existing cart first
+    items.forEach((item) => {
+      db.transact(tx.cartItems[item.id].delete());
+    });
+
+    // Add restored items
+    newItems.forEach((item) => {
+      db.transact(tx.cartItems[id()].update(item));
+    });
+  };
+
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -84,6 +97,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
+        restoreCart,
         total,
         itemCount,
       }}

@@ -217,6 +217,32 @@ export async function POST(request: NextRequest) {
         });
 
         console.log(`Order confirmation email sent to ${customerEmail}`);
+
+        // Mark any abandoned cart as recovered
+        try {
+          const cartsResult = await adminDb.query({ abandonedCarts: {} });
+          interface AbandonedCart {
+            id: string;
+            email: string;
+            recovered: boolean;
+          }
+          const abandonedCarts = (cartsResult.abandonedCarts || []) as AbandonedCart[];
+          const matchingCart = abandonedCarts.find(
+            (cart) => cart.email.toLowerCase() === customerEmail.toLowerCase() && !cart.recovered
+          );
+
+          if (matchingCart) {
+            await adminDb.transact([
+              tx.abandonedCarts[matchingCart.id].update({
+                recovered: true,
+              }),
+            ]);
+            console.log(`Marked abandoned cart ${matchingCart.id} as recovered`);
+          }
+        } catch (cartError) {
+          // Non-critical - just log it
+          console.error("Failed to mark abandoned cart as recovered:", cartError);
+        }
       }
     } catch (error) {
       await logError({
