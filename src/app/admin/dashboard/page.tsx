@@ -17,10 +17,26 @@ interface Order {
 interface InventoryItem {
   id: string;
   productId: string;
+  productName: string;
   color: string;
   size: string;
   stock: number;
   lowStockThreshold: number;
+}
+
+interface AbandonedCart {
+  id: string;
+  email: string;
+  total: number;
+  recovered: boolean;
+  createdAt: number;
+}
+
+interface ErrorLog {
+  id: string;
+  resolved: boolean;
+  severity: string;
+  createdAt: number;
 }
 
 interface DashboardStats {
@@ -44,19 +60,20 @@ interface TopProduct {
   revenue: number;
 }
 
-function StatCard({ title, value, subtitle, trend, icon }: {
+function StatCard({ title, value, subtitle, trend, icon, alert }: {
   title: string;
   value: string;
   subtitle?: string;
   trend?: { value: string; positive: boolean };
   icon: React.ReactNode;
+  alert?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-stone-200">
+    <div className={`bg-white rounded-lg p-6 shadow-sm border ${alert ? 'border-red-300 bg-red-50' : 'border-stone-200'}`}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-stone-500 font-medium">{title}</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{value}</p>
+          <p className={`text-2xl font-bold mt-1 ${alert ? 'text-red-600' : 'text-stone-900'}`}>{value}</p>
           {subtitle && <p className="text-xs text-stone-400 mt-1">{subtitle}</p>}
           {trend && (
             <p className={`text-xs mt-2 font-medium ${trend.positive ? "text-emerald-600" : "text-red-600"}`}>
@@ -64,18 +81,50 @@ function StatCard({ title, value, subtitle, trend, icon }: {
             </p>
           )}
         </div>
-        <div className="text-stone-400">{icon}</div>
+        <div className={alert ? 'text-red-400' : 'text-stone-400'}>{icon}</div>
       </div>
     </div>
+  );
+}
+
+function ExternalLink({ href, icon, title, description, color }: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  color: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center gap-4 p-4 rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all bg-white group`}
+    >
+      <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-stone-900 group-hover:text-stone-700">{title}</p>
+        <p className="text-xs text-stone-500 truncate">{description}</p>
+      </div>
+      <svg className="w-4 h-4 text-stone-400 group-hover:text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    </a>
   );
 }
 
 export default function AdminDashboard() {
   const { isLoading: ordersLoading, data: ordersData } = db.useQuery({ orders: {} });
   const { isLoading: inventoryLoading, data: inventoryData } = db.useQuery({ inventory: {} });
+  const { isLoading: cartsLoading, data: cartsData } = db.useQuery({ abandonedCarts: {} });
+  const { isLoading: errorsLoading, data: errorsData } = db.useQuery({ errors: {} });
 
   const orders = (ordersData?.orders || []) as Order[];
   const inventory = (inventoryData?.inventory || []) as InventoryItem[];
+  const abandonedCarts = (cartsData?.abandonedCarts || []) as AbandonedCart[];
+  const errors = (errorsData?.errors || []) as ErrorLog[];
 
   const calculateStats = (): DashboardStats => {
     const now = Date.now();
@@ -145,10 +194,20 @@ export default function AdminDashboard() {
       .slice(0, 5);
   };
 
+  const getUnresolvedErrors = () => {
+    return errors.filter(e => !e.resolved);
+  };
+
+  const getActiveAbandonedCarts = () => {
+    return abandonedCarts.filter(c => !c.recovered);
+  };
+
   const stats = calculateStats();
   const topProducts = getTopProducts();
   const lowStockItems = getLowStockItems();
   const recentOrders = getRecentOrders();
+  const unresolvedErrors = getUnresolvedErrors();
+  const activeAbandonedCarts = getActiveAbandonedCarts();
 
   const formatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
   const formatDate = (timestamp: number) => {
@@ -160,10 +219,15 @@ export default function AdminDashboard() {
     });
   };
 
-  if (ordersLoading || inventoryLoading) {
+  const isLoading = ordersLoading || inventoryLoading || cartsLoading || errorsLoading;
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
-        <p className="text-stone-600">Loading dashboard...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-900 mx-auto mb-4"></div>
+          <p className="text-stone-600">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
@@ -174,29 +238,44 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-stone-900">Dashboard</h1>
-            <p className="text-stone-500 mt-1">Overview of your store performance</p>
+            <h1 className="text-3xl font-bold text-stone-900">Admin Hub</h1>
+            <p className="text-stone-500 mt-1">Back Nine Apparel Command Center</p>
           </div>
           <div className="flex gap-3">
-            <Link
-              href="/admin/orders"
-              className="px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-stone-700 hover:bg-stone-50"
+            <a
+              href="https://www.backnineshop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-stone-700 hover:bg-stone-50 flex items-center gap-2"
             >
-              View Orders
-            </Link>
-            <Link
-              href="/admin/inventory"
-              className="px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-stone-700 hover:bg-stone-50"
-            >
-              Manage Inventory
-            </Link>
-            <Link
-              href="/admin/analytics"
-              className="px-4 py-2 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800"
-            >
-              Full Analytics
-            </Link>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View Store
+            </a>
           </div>
+        </div>
+
+        {/* Alert Banner - Stripe Test Mode */}
+        <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 mb-6 flex items-center gap-4">
+          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-amber-800">Stripe is in TEST MODE</p>
+            <p className="text-sm text-amber-700">Real payments won&apos;t process. Complete the go-live checklist to accept payments.</p>
+          </div>
+          <a
+            href="https://dashboard.stripe.com/settings/account"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 flex-shrink-0"
+          >
+            Activate Stripe
+          </a>
         </div>
 
         {/* Stats Grid */}
@@ -243,18 +322,15 @@ export default function AdminDashboard() {
           />
         </div>
 
-        {/* Order Status Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {/* Order Status + Alerts Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-amber-700 font-medium">Needs Shipping</p>
                 <p className="text-3xl font-bold text-amber-800">{stats.pendingOrders}</p>
               </div>
-              <Link
-                href="/admin/orders"
-                className="text-amber-600 hover:text-amber-800 text-sm font-medium"
-              >
+              <Link href="/admin/orders" className="text-amber-600 hover:text-amber-800 text-sm font-medium">
                 View &rarr;
               </Link>
             </div>
@@ -277,9 +353,29 @@ export default function AdminDashboard() {
               <span className="text-emerald-400 text-sm">Complete</span>
             </div>
           </div>
+          <div className={`rounded-lg p-4 ${unresolvedErrors.length > 0 ? 'bg-red-50 border border-red-200' : 'bg-stone-50 border border-stone-200'}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-sm font-medium ${unresolvedErrors.length > 0 ? 'text-red-700' : 'text-stone-600'}`}>Errors</p>
+                <p className={`text-3xl font-bold ${unresolvedErrors.length > 0 ? 'text-red-800' : 'text-stone-800'}`}>{unresolvedErrors.length}</p>
+              </div>
+              <Link href="/admin/errors" className={`text-sm font-medium ${unresolvedErrors.length > 0 ? 'text-red-600 hover:text-red-800' : 'text-stone-500 hover:text-stone-700'}`}>
+                View &rarr;
+              </Link>
+            </div>
+          </div>
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-purple-700 font-medium">Abandoned Carts</p>
+                <p className="text-3xl font-bold text-purple-800">{activeAbandonedCarts.length}</p>
+              </div>
+              <span className="text-purple-400 text-sm">${activeAbandonedCarts.reduce((s, c) => s + c.total, 0).toFixed(0)}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Recent Orders */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-stone-200">
             <div className="p-4 border-b border-stone-200 flex items-center justify-between">
@@ -358,7 +454,7 @@ export default function AdminDashboard() {
                   lowStockItems.slice(0, 5).map((item) => (
                     <div key={item.id} className="p-4 flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-stone-900 text-sm">{item.productId}</p>
+                        <p className="font-medium text-stone-900 text-sm">{item.productName || item.productId}</p>
                         <p className="text-xs text-stone-500">{item.color} / {item.size}</p>
                       </div>
                       <span className={`text-sm font-medium ${
@@ -374,44 +470,216 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Link
-            href="/admin/orders"
-            className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 transition-colors text-center"
-          >
-            <svg className="w-6 h-6 mx-auto text-stone-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <p className="text-sm font-medium text-stone-700">Orders</p>
-          </Link>
-          <Link
-            href="/admin/inventory"
-            className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 transition-colors text-center"
-          >
-            <svg className="w-6 h-6 mx-auto text-stone-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-            <p className="text-sm font-medium text-stone-700">Inventory</p>
-          </Link>
-          <Link
-            href="/admin/analytics"
-            className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 transition-colors text-center"
-          >
-            <svg className="w-6 h-6 mx-auto text-stone-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <p className="text-sm font-medium text-stone-700">Analytics</p>
-          </Link>
-          <Link
-            href="/admin/errors"
-            className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 transition-colors text-center"
-          >
-            <svg className="w-6 h-6 mx-auto text-stone-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <p className="text-sm font-medium text-stone-700">Errors</p>
-          </Link>
+        {/* External Services Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-stone-900 mb-4">External Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Stripe */}
+            <ExternalLink
+              href="https://dashboard.stripe.com"
+              title="Stripe Dashboard"
+              description="Payments, refunds, disputes"
+              color="bg-purple-100"
+              icon={
+                <svg className="w-5 h-5 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
+                </svg>
+              }
+            />
+
+            {/* InstantDB */}
+            <ExternalLink
+              href="https://instantdb.com/dash"
+              title="InstantDB"
+              description="Database, orders, inventory data"
+              color="bg-blue-100"
+              icon={
+                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                </svg>
+              }
+            />
+
+            {/* Resend */}
+            <ExternalLink
+              href="https://resend.com/emails"
+              title="Resend"
+              description="Email delivery logs"
+              color="bg-stone-800"
+              icon={
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              }
+            />
+
+            {/* Vercel */}
+            <ExternalLink
+              href="https://vercel.com/7layerlabs-projects/backnine"
+              title="Vercel"
+              description="Deployments, logs, settings"
+              color="bg-black"
+              icon={
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 22.525H0l12-21.05 12 21.05z"/>
+                </svg>
+              }
+            />
+
+            {/* GitHub */}
+            <ExternalLink
+              href="https://github.com/7LayerLabs/backnine"
+              title="GitHub"
+              description="Source code repository"
+              color="bg-stone-900"
+              icon={
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+              }
+            />
+
+            {/* Gmail */}
+            <ExternalLink
+              href="https://mail.google.com"
+              title="Gmail"
+              description="Business email"
+              color="bg-red-100"
+              icon={
+                <svg className="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+                </svg>
+              }
+            />
+
+            {/* Privateemail */}
+            <ExternalLink
+              href="https://privateemail.com"
+              title="Privateemail"
+              description="hello@backnineshop.com"
+              color="bg-orange-100"
+              icon={
+                <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              }
+            />
+
+            {/* Namecheap */}
+            <ExternalLink
+              href="https://www.namecheap.com/myaccount/domain-list/"
+              title="Namecheap"
+              description="Domain management"
+              color="bg-orange-500"
+              icon={
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+              }
+            />
+
+            {/* Google Analytics (if used) */}
+            <ExternalLink
+              href="https://analytics.google.com"
+              title="Google Analytics"
+              description="Website traffic & behavior"
+              color="bg-yellow-100"
+              icon={
+                <svg className="w-5 h-5 text-yellow-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22.84 2.9982v17.9987c.0086.5366-.2018 1.0534-.5852 1.4368-.3833.3834-.9.5765-1.4367.5369H3.1818c-1.0927 0-2.0454-.8727-2.0454-1.9736V3.1818c0-1.0927.9527-2.0454 2.0454-2.0454h17.6363c1.1009 0 2.0219.9527 2.0219 2.0454v-.1836zM7.5 19.0909c.9545 0 1.7045-.75 1.7045-1.7045V6.6136c0-.9545-.75-1.7045-1.7045-1.7045-.9546 0-1.7046.75-1.7046 1.7045v10.7728c0 .9545.75 1.7045 1.7046 1.7045zm4.7727 0c.9546 0 1.7046-.75 1.7046-1.7045v-6.8182c0-.9545-.75-1.7046-1.7046-1.7046-.9545 0-1.7045.7501-1.7045 1.7046v6.8182c0 .9545.75 1.7045 1.7045 1.7045zm4.7728 0c.9545 0 1.7045-.75 1.7045-1.7045v-3.4091c0-.9546-.75-1.7046-1.7045-1.7046-.9546 0-1.7046.75-1.7046 1.7046v3.4091c0 .9545.75 1.7045 1.7046 1.7045z"/>
+                </svg>
+              }
+            />
+          </div>
+        </div>
+
+        {/* Admin Pages Quick Links */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-stone-900 mb-4">Admin Pages</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+            <Link
+              href="/admin/orders"
+              className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"
+            >
+              <div className="w-12 h-12 bg-amber-100 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-stone-700">Orders</p>
+              {stats.pendingOrders > 0 && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">
+                  {stats.pendingOrders} pending
+                </span>
+              )}
+            </Link>
+
+            <Link
+              href="/admin/inventory"
+              className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"
+            >
+              <div className="w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-stone-700">Inventory</p>
+              {lowStockItems.length > 0 && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
+                  {lowStockItems.length} low
+                </span>
+              )}
+            </Link>
+
+            <Link
+              href="/admin/analytics"
+              className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"
+            >
+              <div className="w-12 h-12 bg-emerald-100 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-stone-700">Analytics</p>
+            </Link>
+
+            <Link
+              href="/admin/errors"
+              className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"
+            >
+              <div className={`w-12 h-12 rounded-lg mx-auto mb-3 flex items-center justify-center transition-colors ${unresolvedErrors.length > 0 ? 'bg-red-100 group-hover:bg-red-200' : 'bg-stone-100 group-hover:bg-stone-200'}`}>
+                <svg className={`w-6 h-6 ${unresolvedErrors.length > 0 ? 'text-red-600' : 'text-stone-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-stone-700">Errors</p>
+              {unresolvedErrors.length > 0 && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
+                  {unresolvedErrors.length} unresolved
+                </span>
+              )}
+            </Link>
+
+            <a
+              href="https://www.backnineshop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"
+            >
+              <div className="w-12 h-12 bg-stone-900 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-stone-800 transition-colors">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-stone-700">View Store</p>
+            </a>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-stone-400 text-sm pt-4 border-t border-stone-200">
+          <p>Back Nine Apparel Admin Hub</p>
         </div>
       </div>
     </div>
