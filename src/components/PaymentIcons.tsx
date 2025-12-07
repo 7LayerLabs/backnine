@@ -22,29 +22,31 @@ export default function PaymentIcons({
         </span>
       )}
       <Image
-        src="/payment logos/visa.svg"
+        src="/payment%20logos/visa.svg"
         alt="Visa"
         width={40}
         height={26}
         className={`${iconHeight} w-auto`}
       />
       <Image
-        src="/payment logos/mastercard.svg"
+        src="/payment%20logos/mastercard.svg"
         alt="Mastercard"
         width={40}
         height={26}
         className={`${iconHeight} w-auto`}
       />
       <Image
-        src="/payment logos/amex.svg"
+        src="/payment%20logos/amex.svg"
         alt="American Express"
         width={40}
         height={26}
         className={`${iconHeight} w-auto`}
       />
-      <img
-        src="/payment logos/klarna.png"
+      <Image
+        src="/payment%20logos/klarna.png"
         alt="Klarna"
+        width={40}
+        height={26}
         className={`${iconHeight} w-auto`}
       />
     </div>
