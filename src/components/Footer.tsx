@@ -162,7 +162,7 @@ export default function Footer() {
         <div className="border-t border-stone-800 mt-12 pt-8">
           {/* Payment Methods */}
           <PaymentIcons size="md" className="mb-6" />
-          <p className="text-center text-stone-500 text-sm">&copy; <Link href="/admin/orders" className="hover:text-stone-400 transition-colors">2025 Back Nine Apparel</Link>. All rights reserved.</p>
+          <p className="text-center text-stone-500 text-sm">&copy; <Link href="/admin/dashboard" className="hover:text-stone-400 transition-colors">2025 Back Nine Apparel</Link>. All rights reserved.</p>
         </div>
       </div>
     </footer>
