@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import PaymentIcons from "./PaymentIcons";
 
 export default function Footer() {
   return (
@@ -160,13 +161,7 @@ export default function Footer() {
 
         <div className="border-t border-stone-800 mt-12 pt-8">
           {/* Payment Methods */}
-          <div className="flex items-center justify-center gap-4 mb-6 flex-wrap">
-            <span className="text-xs text-stone-500 mr-2">Secure payments with</span>
-            <Image src="/payment logos/visa.svg" alt="Visa" width={50} height={32} className="h-8 w-auto" />
-            <Image src="/payment logos/mastercard.svg" alt="Mastercard" width={50} height={32} className="h-8 w-auto" />
-            <Image src="/payment logos/amex.svg" alt="American Express" width={50} height={32} className="h-8 w-auto" />
-            <img src="/payment logos/klarna.png" alt="Klarna" className="h-8 w-auto" />
-          </div>
+          <PaymentIcons size="md" className="mb-6" />
           <p className="text-center text-stone-500 text-sm">&copy; <Link href="/admin/orders" className="hover:text-stone-400 transition-colors">2025 Back Nine Apparel</Link>. All rights reserved.</p>
         </div>
       </div>
