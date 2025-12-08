@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_BASE_URL || "https://www.backnineshop.com";
+
     // Create Stripe checkout session for Rocky Roast
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: "Rocky Roast",
               description: "Send Rocky a brutal roast about his golf game",
-              images: [`${process.env.NEXT_PUBLIC_BASE_URL || "https://www.backnineshop.com"}/sellable items/rocky-roast.svg`],
+              images: ["https://www.backnineshop.com/apparel/marketing/rockygolfball.png"],
             },
             unit_amount: 100, // $1.00 in cents
           },
@@ -35,8 +37,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${request.headers.get("origin")}/rocky-roast/success`,
-      cancel_url: `${request.headers.get("origin")}/rocky-roast`,
+      success_url: `${origin}/rocky-roast/success`,
+      cancel_url: `${origin}/rocky-roast`,
       // Store the roast message in metadata
       metadata: {
         roastMessage: roastMessage.substring(0, 500), // Stripe metadata limit
