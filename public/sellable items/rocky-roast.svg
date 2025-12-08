@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a"/>
+      <stop offset="100%" style="stop-color:#0d0d0d"/>
+    </linearGradient>
+    <linearGradient id="fire" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff4500"/>
+      <stop offset="50%" style="stop-color:#ff6b35"/>
+      <stop offset="100%" style="stop-color:#ffa500"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg)"/>
+
+  <!-- Decorative border -->
+  <rect x="15" y="15" width="370" height="370" fill="none" stroke="#333" stroke-width="2" rx="8"/>
+
+  <!-- Fire/Flame icon -->
+  <g transform="translate(200, 140)">
+    <path d="M0 60 C-20 40 -30 10 -25 -20 C-20 -10 -10 -5 0 -30 C10 -5 20 -10 25 -20 C30 10 20 40 0 60 Z"
+          fill="url(#fire)" transform="scale(1.5)"/>
+    <path d="M0 50 C-10 35 -15 15 -12 -5 C-8 0 -3 3 0 -15 C3 3 8 0 12 -5 C15 15 10 35 0 50 Z"
+          fill="#ffcc00" transform="scale(1.2)"/>
+  </g>
+
+  <!-- Golf ball being roasted -->
+  <g transform="translate(200, 220)">
+    <circle cx="0" cy="0" r="25" fill="#f5f5f5" stroke="#ddd" stroke-width="2"/>
+    <!-- Dimples -->
+    <circle cx="-8" cy="-8" r="3" fill="#e0e0e0"/>
+    <circle cx="8" cy="-8" r="3" fill="#e0e0e0"/>
+    <circle cx="0" cy="5" r="3" fill="#e0e0e0"/>
+    <circle cx="-12" cy="5" r="2.5" fill="#e0e0e0"/>
+    <circle cx="12" cy="5" r="2.5" fill="#e0e0e0"/>
+  </g>
+
+  <!-- Text: ROCKY -->
+  <text x="200" y="290" font-family="Georgia, serif" font-size="42" font-weight="bold" fill="#ffffff" text-anchor="middle">ROCKY</text>
+
+  <!-- Text: ROAST -->
+  <text x="200" y="330" font-family="Georgia, serif" font-size="28" fill="#ff6b35" text-anchor="middle" letter-spacing="8">ROAST</text>
+
+  <!-- Subtext -->
+  <text x="200" y="365" font-family="Arial, sans-serif" font-size="12" fill="#666" text-anchor="middle">$1 to destroy his golf game</text>
+</svg>

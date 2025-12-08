@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { Product, ColorVariant } from "@/data/products";
@@ -22,6 +23,9 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
   const currentImage = selectedColor?.image ?? product.image;
   const maxVisibleColors = 5;
   const hasMoreColors = product.colors && product.colors.length > maxVisibleColors;
+
+  // Check if this is the Rocky Roast product
+  const isRockyRoast = product.id === "rocky-roast";
 
   const handleAddToCart = () => {
     addItem({
@@ -58,12 +62,21 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           </span>
         )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-          <button
-            onClick={() => onQuickView(product, selectedColor)}
-            className="bg-white text-stone-900 px-6 py-3 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity hover:bg-stone-100"
-          >
-            Quick View
-          </button>
+          {isRockyRoast ? (
+            <Link
+              href="/rocky-roast"
+              className="bg-white text-stone-900 px-6 py-3 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity hover:bg-stone-100"
+            >
+              Send Roast
+            </Link>
+          ) : (
+            <button
+              onClick={() => onQuickView(product, selectedColor)}
+              className="bg-white text-stone-900 px-6 py-3 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity hover:bg-stone-100"
+            >
+              Quick View
+            </button>
+          )}
         </div>
       </div>
       <div className="flex flex-col flex-grow">
@@ -98,16 +111,25 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
         <div className="mt-auto pt-1 sm:pt-2">
           <p className="font-semibold text-stone-900 text-sm sm:text-base mb-1 sm:mb-2">${product.price.toFixed(2)}</p>
-          <button
-            onClick={handleAddToCart}
-            className={`w-full py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
-              isAdded
-                ? "bg-emerald-600 text-white"
-                : "bg-stone-900 text-white hover:bg-stone-800"
-            }`}
-          >
-            {isAdded ? "Added!" : "Add to Cart"}
-          </button>
+          {isRockyRoast ? (
+            <Link
+              href="/rocky-roast"
+              className="block w-full py-2 sm:py-3 text-xs sm:text-sm font-medium text-center bg-green-600 text-white hover:bg-green-500 transition-colors"
+            >
+              Send Roast
+            </Link>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className={`w-full py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
+                isAdded
+                  ? "bg-emerald-600 text-white"
+                  : "bg-stone-900 text-white hover:bg-stone-800"
+              }`}
+            >
+              {isAdded ? "Added!" : "Add to Cart"}
+            </button>
+          )}
         </div>
       </div>
     </div>
