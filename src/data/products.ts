@@ -329,7 +329,7 @@ export const products: Product[] = [
     name: "Rocky Roast",
     description: "Send Rocky a brutal roast about his golf game",
     price: 1.0,
-    image: "/sellable items/rocky-roast.svg",
+    image: "/apparel/marketing/rockygolfball.png",
     category: "accessories",
     longDescription: "Know someone named Rocky who thinks they can play golf? Let us handle it. For just $1, we'll send Rocky an absolutely devastating email roasting his golf game into oblivion. No mercy. No refunds. Just pure, unfiltered truth about his slice, his putting, and that time he lost 6 balls on a par 3. This is a digital product - the roast email is sent immediately after purchase.",
     features: [
