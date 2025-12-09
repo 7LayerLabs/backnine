@@ -24,6 +24,7 @@ export interface Product {
   shipping?: string;
   isDigitalProduct?: boolean;
   published: boolean;
+  available: boolean; // Can be purchased (false = shows "Unavailable - Check Back Soon")
   sortOrder: number;
   createdAt: number;
   updatedAt: number;

@@ -23,6 +23,7 @@ function convertDbProduct(dbProduct: DbProduct): Product {
     features: dbProduct.features ? JSON.parse(dbProduct.features) : undefined,
     careInstructions: dbProduct.careInstructions ? JSON.parse(dbProduct.careInstructions) : undefined,
     shipping: dbProduct.shipping,
+    available: dbProduct.available !== false, // Default to true if not set
   };
 }
 

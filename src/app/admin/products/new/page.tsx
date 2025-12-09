@@ -22,6 +22,7 @@ interface ProductForm {
   shipping: string;
   isDigitalProduct: boolean;
   published: boolean;
+  available: boolean;
 }
 
 const defaultForm: ProductForm = {
@@ -39,6 +40,7 @@ const defaultForm: ProductForm = {
   shipping: "5-7 business days",
   isDigitalProduct: false,
   published: false,
+  available: true,
 };
 
 const commonSizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "One Size"];
@@ -177,6 +179,7 @@ export default function NewProduct() {
           shipping: form.shipping,
           isDigitalProduct: form.isDigitalProduct,
           published: form.published,
+          available: form.available,
           sortOrder: now,
           createdAt: now,
           updatedAt: now,
@@ -565,6 +568,32 @@ export default function NewProduct() {
                 className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200"
               >
                 Add
+              </button>
+            </div>
+          </div>
+
+          {/* Availability */}
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-stone-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-stone-900">Availability</h2>
+                <p className="text-sm text-stone-500 mt-1">
+                  {form.available
+                    ? "Product can be purchased"
+                    : "Shows \"Unavailable - Check Back Soon\" on store"}
+                </p>
+              </div>
+              <button
+                onClick={() => setForm({ ...form, available: !form.available })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  form.available ? "bg-blue-500" : "bg-amber-500"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    form.available ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
               </button>
             </div>
           </div>

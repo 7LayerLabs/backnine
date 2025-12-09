@@ -30,6 +30,9 @@ export default function QuickViewModal({
 
   const currentImage = selectedColor?.image ?? product.image;
 
+  // Check if product is available for purchase
+  const isUnavailable = product.available === false;
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -46,6 +49,7 @@ export default function QuickViewModal({
   }, [onClose]);
 
   const handleAddToCart = () => {
+    if (isUnavailable) return;
     addItem({
       productId: product.id,
       productName: product.name,
@@ -87,6 +91,13 @@ export default function QuickViewModal({
             />
           </div>
           <div className="p-5 sm:p-8 flex flex-col">
+            {/* Unavailable Notice */}
+            {isUnavailable && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4">
+                <p className="text-sm font-medium text-amber-800">Unavailable - Check Back Soon</p>
+                <p className="text-xs text-amber-600 mt-1">This item is temporarily out of stock.</p>
+              </div>
+            )}
             <h2 className="text-2xl font-semibold text-stone-900 mb-2">
               {product.name}
             </h2>
@@ -161,16 +172,25 @@ export default function QuickViewModal({
               </div>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              className={`w-full py-4 text-sm font-medium transition-colors ${
-                isAdded
-                  ? "bg-emerald-600 text-white"
-                  : "bg-stone-900 text-white hover:bg-stone-800"
-              }`}
-            >
-              {isAdded ? "Added to Cart!" : "Add to Cart"}
-            </button>
+            {isUnavailable ? (
+              <button
+                disabled
+                className="w-full py-4 text-sm font-medium bg-stone-300 text-stone-500 cursor-not-allowed"
+              >
+                Unavailable
+              </button>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className={`w-full py-4 text-sm font-medium transition-colors ${
+                  isAdded
+                    ? "bg-emerald-600 text-white"
+                    : "bg-stone-900 text-white hover:bg-stone-800"
+                }`}
+              >
+                {isAdded ? "Added to Cart!" : "Add to Cart"}
+              </button>
+            )}
 
             {/* Detailed Product Information */}
             <div className="mt-6 pt-6 border-t border-stone-200">

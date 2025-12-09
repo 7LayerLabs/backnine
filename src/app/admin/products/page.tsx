@@ -35,6 +35,16 @@ export default function AdminProducts() {
     }
   };
 
+  const toggleAvailable = async (product: Product) => {
+    try {
+      await db.transact([
+        db.tx.products[product.id].update({ available: !product.available }),
+      ]);
+    } catch (error) {
+      console.error("Failed to update product:", error);
+    }
+  };
+
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
 
   if (isLoading) {
@@ -104,7 +114,8 @@ export default function AdminProducts() {
                   <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Product</th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Category</th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Price</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Status</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Visibility</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Available</th>
                   <th className="text-right px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
@@ -154,6 +165,18 @@ export default function AdminProducts() {
                         }`}
                       >
                         {product.published ? "Published" : "Draft"}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => toggleAvailable(product)}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          product.available !== false
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {product.available !== false ? "In Stock" : "Unavailable"}
                       </button>
                     </td>
                     <td className="px-6 py-4 text-right">

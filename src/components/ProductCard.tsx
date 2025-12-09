@@ -27,7 +27,11 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
   // Check if this is the Rocky Roast product
   const isRockyRoast = product.id === "rocky-roast";
 
+  // Check if product is available for purchase
+  const isUnavailable = product.available === false;
+
   const handleAddToCart = () => {
+    if (isUnavailable) return;
     addItem({
       productId: product.id,
       productName: product.name,
@@ -50,7 +54,16 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        {product.badge && (
+        {/* Unavailable overlay */}
+        {isUnavailable && (
+          <div className="absolute inset-0 bg-stone-900/60 flex items-center justify-center z-10">
+            <div className="bg-white/95 px-4 py-2 text-center">
+              <p className="text-sm font-medium text-stone-900">Unavailable</p>
+              <p className="text-xs text-stone-600">Check Back Soon</p>
+            </div>
+          </div>
+        )}
+        {product.badge && !isUnavailable && (
           <span
             className={`absolute top-3 left-3 px-3 py-1 text-xs font-medium ${
               product.badge === "New"
@@ -118,6 +131,13 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
             >
               Send Roast
             </Link>
+          ) : isUnavailable ? (
+            <button
+              disabled
+              className="w-full py-2 sm:py-3 text-xs sm:text-sm font-medium bg-stone-300 text-stone-500 cursor-not-allowed"
+            >
+              Unavailable
+            </button>
           ) : (
             <button
               onClick={handleAddToCart}

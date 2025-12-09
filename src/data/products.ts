@@ -21,6 +21,8 @@ export interface Product {
   careInstructions?: string[];
   sizes?: string[];
   shipping?: string;
+  // Availability (defaults to true if not set)
+  available?: boolean;
 }
 
 // All products with their color variants

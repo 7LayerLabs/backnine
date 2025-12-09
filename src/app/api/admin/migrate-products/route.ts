@@ -33,6 +33,7 @@ export async function POST() {
         shipping: product.shipping || "5-7 business days",
         isDigitalProduct: product.id === "rocky-roast",
         published: true,
+        available: true,
         sortOrder: index,
         createdAt: now,
         updatedAt: now,
