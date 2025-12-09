@@ -257,24 +257,24 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Alert Banner - Stripe Test Mode */}
-        <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 mb-6 flex items-center gap-4">
-          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        {/* Live Mode Banner */}
+        <div className="bg-emerald-50 border border-emerald-300 rounded-lg p-4 mb-6 flex items-center gap-4">
+          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <div className="flex-1">
-            <p className="font-medium text-amber-800">Stripe is in TEST MODE</p>
-            <p className="text-sm text-amber-700">Real payments won&apos;t process. Complete the go-live checklist to accept payments.</p>
+            <p className="font-medium text-emerald-800">Stripe is LIVE</p>
+            <p className="text-sm text-emerald-700">Accepting real payments. All systems operational.</p>
           </div>
           <a
-            href="https://dashboard.stripe.com/settings/account"
+            href="https://dashboard.stripe.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 flex-shrink-0"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 flex-shrink-0"
           >
-            Activate Stripe
+            View Stripe
           </a>
         </div>
 
