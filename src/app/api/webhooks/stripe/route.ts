@@ -145,88 +145,145 @@ export async function POST(request: NextRequest) {
       // Send order confirmation email to customer
       if (customerEmail) {
         const orderNumber = orderId.slice(-8).toUpperCase();
-        const itemsHtml = orderItems.map(item =>
-          `<tr>
-            <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4;">
-              <strong>${item.name}</strong><br>
-              <span style="color: #78716c;">Qty: ${item.quantity}</span>
-            </td>
-            <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">$${item.price.toFixed(2)}</td>
-          </tr>`
-        ).join('');
 
-        const shippingHtml = shipping ? `
-          <p style="margin: 0;">
-            ${shipping.name}<br>
-            ${shipping.address?.line1}<br>
-            ${shipping.address?.line2 ? shipping.address.line2 + '<br>' : ''}
-            ${shipping.address?.city}, ${shipping.address?.state} ${shipping.address?.postal_code}
-          </p>
-        ` : '';
+        // Special confirmation email for Rocky Roast purchases
+        if (isRockyRoast) {
+          // Get the roast message for the buyer's confirmation
+          const buyerMetadata = fullSession.metadata || session.metadata || {};
+          const buyerRoastMessage = [
+            buyerMetadata.roastMessage || "",
+            buyerMetadata.roastMessagePart2 || "",
+            buyerMetadata.roastMessagePart3 || "",
+            buyerMetadata.roastMessagePart4 || "",
+          ].join("");
 
-        await resend.emails.send({
-          from: "Back Nine Apparel <hello@backnineshop.com>",
-          to: customerEmail,
-          subject: `Order Confirmed! #${orderNumber}`,
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head><meta charset="utf-8"></head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f4;">
-              <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                  <h1 style="color: #1e3a5f; margin: 0;">Thanks for your order!</h1>
-                  <p style="color: #78716c; margin-top: 10px;">Order #${orderNumber}</p>
+          await resend.emails.send({
+            from: "Back Nine Apparel <hello@backnineshop.com>",
+            to: customerEmail,
+            subject: `Roast Delivered! Rocky has been notified.`,
+            html: `
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="utf-8"></head>
+              <body style="font-family: Georgia, serif; padding: 40px; background: #1a1a1a; color: #e5e5e5;">
+                <div style="max-width: 600px; margin: 0 auto; background: #0d0d0d; padding: 40px; border-radius: 8px; border: 1px solid #333;">
+                  <h1 style="color: #22c55e; margin-top: 0; text-align: center;">Roast Delivered!</h1>
+
+                  <p style="text-align: center; color: #888; font-size: 16px;">
+                    Rocky just received your roast. He has no idea who sent it.<br>
+                    Your identity remains completely anonymous.
+                  </p>
+
+                  <hr style="border: none; border-top: 1px solid #333; margin: 30px 0;">
+
+                  <h3 style="color: #e5e5e5; margin-bottom: 15px;">Here's what you sent:</h3>
+
+                  <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                    <pre style="white-space: pre-wrap; font-family: Georgia, serif; color: #ccc; margin: 0; font-size: 14px; line-height: 1.6;">${buyerRoastMessage}</pre>
+                  </div>
+
+                  <hr style="border: none; border-top: 1px solid #333; margin: 30px 0;">
+
+                  <p style="text-align: center; color: #666; font-size: 14px;">
+                    Want to roast Rocky again?<br>
+                    <a href="https://www.backnineshop.com/rocky-roast" style="color: #22c55e;">Send another roast</a>
+                  </p>
+
+                  <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                    <a href="https://www.backnineshop.com" style="color: #888; text-decoration: none; font-size: 14px;">Back Nine Apparel</a>
+                  </div>
                 </div>
+              </body>
+              </html>
+            `,
+          });
 
-                <p>Hey ${customerName || 'there'},</p>
+          console.log(`Rocky Roast confirmation email sent to ${customerEmail}`);
+        } else {
+          // Regular order confirmation for non-roast purchases
+          const itemsHtml = orderItems.map(item =>
+            `<tr>
+              <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4;">
+                <strong>${item.name}</strong><br>
+                <span style="color: #78716c;">Qty: ${item.quantity}</span>
+              </td>
+              <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">$${item.price.toFixed(2)}</td>
+            </tr>`
+          ).join('');
 
-                <p>We've received your order and are getting it ready. You'll receive another email when it ships.</p>
+          const shippingHtml = shipping ? `
+            <p style="margin: 0;">
+              ${shipping.name}<br>
+              ${shipping.address?.line1}<br>
+              ${shipping.address?.line2 ? shipping.address.line2 + '<br>' : ''}
+              ${shipping.address?.city}, ${shipping.address?.state} ${shipping.address?.postal_code}
+            </p>
+          ` : '';
 
-                <div style="background: #fafaf9; padding: 20px; border-radius: 8px; margin: 25px 0;">
-                  <h3 style="margin-top: 0; color: #44403c;">Order Summary</h3>
-                  <table style="width: 100%; border-collapse: collapse;">
-                    ${itemsHtml}
-                    <tr>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; color: #78716c;">Subtotal</td>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">$${((session.amount_subtotal || 0) / 100).toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; color: #78716c;">Shipping</td>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">${(session.shipping_cost?.amount_total || 0) === 0 ? 'Free' : '$' + ((session.shipping_cost?.amount_total || 0) / 100).toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 12px 0; font-weight: bold;">Total</td>
-                      <td style="padding: 12px 0; text-align: right; font-weight: bold;">$${((session.amount_total || 0) / 100).toFixed(2)}</td>
-                    </tr>
-                  </table>
+          await resend.emails.send({
+            from: "Back Nine Apparel <hello@backnineshop.com>",
+            to: customerEmail,
+            subject: `Order Confirmed! #${orderNumber}`,
+            html: `
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="utf-8"></head>
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f4;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px;">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #1e3a5f; margin: 0;">Thanks for your order!</h1>
+                    <p style="color: #78716c; margin-top: 10px;">Order #${orderNumber}</p>
+                  </div>
+
+                  <p>Hey ${customerName || 'there'},</p>
+
+                  <p>We've received your order and are getting it ready. You'll receive another email when it ships.</p>
+
+                  <div style="background: #fafaf9; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                    <h3 style="margin-top: 0; color: #44403c;">Order Summary</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                      ${itemsHtml}
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; color: #78716c;">Subtotal</td>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">$${((session.amount_subtotal || 0) / 100).toFixed(2)}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; color: #78716c;">Shipping</td>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #e7e5e4; text-align: right;">${(session.shipping_cost?.amount_total || 0) === 0 ? 'Free' : '$' + ((session.shipping_cost?.amount_total || 0) / 100).toFixed(2)}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0; font-weight: bold;">Total</td>
+                        <td style="padding: 12px 0; text-align: right; font-weight: bold;">$${((session.amount_total || 0) / 100).toFixed(2)}</td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  ${shipping ? `
+                  <div style="margin: 25px 0;">
+                    <h3 style="margin-bottom: 10px; color: #44403c;">Shipping To</h3>
+                    ${shippingHtml}
+                  </div>
+                  ` : ''}
+
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="https://www.backnineshop.com/orders?email=${encodeURIComponent(customerEmail)}&order=${orderNumber}" style="display: inline-block; background: #1e3a5f; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 500;">Track Your Order</a>
+                  </div>
+
+                  <p style="color: #78716c; font-size: 14px; margin-top: 30px;">
+                    Questions about your order? Just reply to this email and we'll help you out.
+                  </p>
+
+                  <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e7e5e4;">
+                    <a href="https://www.backnineshop.com" style="color: #1e3a5f; text-decoration: none; font-weight: 500;">www.backnineshop.com</a>
+                  </div>
                 </div>
+              </body>
+              </html>
+            `,
+          });
 
-                ${shipping ? `
-                <div style="margin: 25px 0;">
-                  <h3 style="margin-bottom: 10px; color: #44403c;">Shipping To</h3>
-                  ${shippingHtml}
-                </div>
-                ` : ''}
-
-                <div style="text-align: center; margin-top: 30px;">
-                  <a href="https://www.backnineshop.com/orders?email=${encodeURIComponent(customerEmail)}&order=${orderNumber}" style="display: inline-block; background: #1e3a5f; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 500;">Track Your Order</a>
-                </div>
-
-                <p style="color: #78716c; font-size: 14px; margin-top: 30px;">
-                  Questions about your order? Just reply to this email and we'll help you out.
-                </p>
-
-                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e7e5e4;">
-                  <a href="https://www.backnineshop.com" style="color: #1e3a5f; text-decoration: none; font-weight: 500;">www.backnineshop.com</a>
-                </div>
-              </div>
-            </body>
-            </html>
-          `,
-        });
-
-        console.log(`Order confirmation email sent to ${customerEmail}`);
+          console.log(`Order confirmation email sent to ${customerEmail}`);
+        }
 
         // Mark any abandoned cart as recovered
         try {
