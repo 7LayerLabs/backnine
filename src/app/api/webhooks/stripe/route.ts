@@ -59,6 +59,9 @@ export async function POST(request: NextRequest) {
       const customerEmail = fullSession.customer_details?.email;
       const customerName = fullSession.customer_details?.name;
 
+      // Check if this is a Rocky Roast (digital product) - auto-complete these
+      const isRockyRoast = fullSession.metadata?.isRockyRoast === "true";
+
       // Save order to InstantDB
       const orderId = id();
       await adminDb.transact([
@@ -69,7 +72,7 @@ export async function POST(request: NextRequest) {
           total: (session.amount_total || 0) / 100,
           subtotal: (session.amount_subtotal || 0) / 100,
           shippingCost: (session.shipping_cost?.amount_total || 0) / 100,
-          status: "paid",
+          status: isRockyRoast ? "delivered" : "paid", // Digital products auto-complete
           customerEmail: customerEmail || "",
           customerName: customerName || "",
           shippingAddress: shipping ? JSON.stringify({
@@ -81,6 +84,7 @@ export async function POST(request: NextRequest) {
             postalCode: shipping.address?.postal_code,
             country: shipping.address?.country,
           }) : "",
+          isDigitalProduct: isRockyRoast, // Flag for digital products
           createdAt: Date.now(),
         }),
       ]);
@@ -218,9 +222,7 @@ export async function POST(request: NextRequest) {
 
         console.log(`Order confirmation email sent to ${customerEmail}`);
 
-        // Check if this is a Rocky Roast purchase
-        const isRockyRoast = fullSession.metadata?.isRockyRoast === "true";
-
+        // Send Rocky Roast email if this is a digital roast purchase
         if (isRockyRoast) {
           // Reconstruct the roast message from metadata parts
           const roastMessage = [
