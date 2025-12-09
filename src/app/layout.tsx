@@ -20,8 +20,17 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.backnineshop.com"),
   title: "Back Nine Apparel | Premium Golf Clothing & Accessories",
   description: "Premium golf lifestyle clothing for those who appreciate the finer things — on and off the course.",
+  openGraph: {
+    title: "Back Nine Apparel",
+    description: "Premium golf lifestyle clothing for those who appreciate the finer things.",
+    url: "https://www.backnineshop.com",
+    siteName: "Back Nine Apparel",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

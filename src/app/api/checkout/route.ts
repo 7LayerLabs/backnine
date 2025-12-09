@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { logError } from "@/lib/error-logger";
+import { products } from "@/data/products";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover",
+  apiVersion: "2025-11-17.clover", // Ensure this matches your Stripe dashboard version or keep as is
 });
 
 interface CartItem {
@@ -14,6 +15,8 @@ interface CartItem {
   quantity: number;
   size: string;
   color?: string;
+  // Metadata for Rocky Roast or other custom items
+  roastMessage?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -27,22 +30,69 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create line items for Stripe
-    const lineItems = items.map((item) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.productName,
-          description: `Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ""}`,
-          images: [item.productImage.startsWith("http")
-            ? item.productImage
-            : `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002"}${item.productImage}`
-          ],
+    // Create line items for Stripe with trustworthy prices
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+
+    // Collect metadata for Rocky Roast if present
+    const sessionMetadata: Record<string, string> = {};
+
+    for (const item of items) {
+      // 1. Find the real product
+      const product = products.find((p) => p.id === item.productId);
+
+      if (!product) {
+        console.error(`Attempt to purchase invalid product: ${item.productId}`);
+        continue;
+      }
+
+      // 2. Use the REAL price from the database/file
+      const realPrice = product.price;
+
+      // 3. Verify price integrity (Optional logging)
+      if (Math.abs(item.price - realPrice) > 0.01) {
+        console.warn(`Price mismatch for ${product.name}. Client: ${item.price}, Server: ${realPrice}. Using Server price.`);
+      }
+
+      // Handle Rocky Roast Metadata logic
+      if (product.id === 'rocky-roast' && item.roastMessage) {
+        sessionMetadata.isRockyRoast = 'true';
+        // Split message if needed to fit metadata limits (500 chars per key)
+        const chunks = item.roastMessage.match(/.{1,500}/g) || [];
+        if (chunks[0]) sessionMetadata.roastMessage = chunks[0];
+        if (chunks[1]) sessionMetadata.roastMessagePart2 = chunks[1];
+        if (chunks[2]) sessionMetadata.roastMessagePart3 = chunks[2];
+        if (chunks[3]) sessionMetadata.roastMessagePart4 = chunks[3];
+      }
+
+      lineItems.push({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: product.name,
+            description: `Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ""}`,
+            images: [
+              product.image.startsWith("http")
+                ? product.image
+                : `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002"}${product.image}`
+            ],
+            metadata: {
+              productId: product.id,
+              size: item.size,
+              color: item.color || ""
+            }
+          },
+          unit_amount: Math.round(realPrice * 100),
         },
-        unit_amount: Math.round(item.price * 100), // Stripe expects cents
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      });
+    }
+
+    if (lineItems.length === 0) {
+      return NextResponse.json(
+        { error: "No valid items found from server records" },
+        { status: 400 }
+      );
+    }
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -55,6 +105,7 @@ export async function POST(request: NextRequest) {
       shipping_address_collection: {
         allowed_countries: ["US", "CA"],
       },
+      metadata: sessionMetadata,
       shipping_options: [
         {
           shipping_rate_data: {
