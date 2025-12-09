@@ -1,15 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
 import QuickViewModal from "./QuickViewModal";
-import { products, Product, ColorVariant } from "@/data/products";
+import { products as staticProducts, Product, ColorVariant } from "@/data/products";
+import { db, Product as DbProduct } from "@/lib/instant";
 import { useShopFilter, Category } from "@/context/ShopFilterContext";
+
+// Convert database product to display product format
+function convertDbProduct(dbProduct: DbProduct): Product {
+  return {
+    id: dbProduct.id,
+    name: dbProduct.name,
+    description: dbProduct.description,
+    longDescription: dbProduct.longDescription,
+    price: dbProduct.price,
+    image: dbProduct.image,
+    category: dbProduct.category,
+    badge: dbProduct.badge as Product["badge"],
+    colors: dbProduct.colors ? JSON.parse(dbProduct.colors) : undefined,
+    sizes: dbProduct.sizes ? JSON.parse(dbProduct.sizes) : undefined,
+    features: dbProduct.features ? JSON.parse(dbProduct.features) : undefined,
+    careInstructions: dbProduct.careInstructions ? JSON.parse(dbProduct.careInstructions) : undefined,
+    shipping: dbProduct.shipping,
+  };
+}
 
 export default function ShopSection() {
   const { activeCategory, subFilter, setFilter } = useShopFilter();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(undefined);
+
+  // Fetch products from database
+  const { data: dbData, isLoading } = db.useQuery({ products: {} });
+
+  // Use database products if available and published, otherwise fall back to static
+  const products = useMemo(() => {
+    const dbProducts = (dbData?.products || []) as DbProduct[];
+    const publishedDbProducts = dbProducts.filter(p => p.published);
+
+    if (publishedDbProducts.length > 0) {
+      // Sort by sortOrder and convert to display format
+      return publishedDbProducts
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .map(convertDbProduct);
+    }
+
+    // Fall back to static products if database is empty
+    return staticProducts;
+  }, [dbData]);
 
   // Filter products by category and sub-filter
   const filteredProducts = products.filter((p) => {

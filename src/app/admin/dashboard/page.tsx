@@ -609,7 +609,19 @@ export default function AdminDashboard() {
         {/* Admin Pages Quick Links */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-stone-900 mb-4">Admin Pages</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+            <Link
+              href="/admin/products"
+              className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"
+            >
+              <div className="w-12 h-12 bg-purple-100 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-stone-700">Products</p>
+            </Link>
+
             <Link
               href="/admin/orders"
               className="bg-white rounded-lg p-4 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all text-center group"

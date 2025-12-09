@@ -1,15 +1,32 @@
 import { init } from "@instantdb/react";
 
+// Color variant type for products with multiple colors
+export interface ColorVariant {
+  name: string;
+  hex: string;
+  image: string;
+}
+
 // Define your schema types
 export interface Product {
   id: string;
   name: string;
   description: string;
+  longDescription?: string;
   price: number;
   image: string;
   category: "tops" | "headwear" | "accessories";
-  badge?: "Bestseller" | "New";
-  inStock: boolean;
+  badge?: "Bestseller" | "New" | "";
+  colors?: string; // JSON stringified ColorVariant[]
+  sizes?: string; // JSON stringified string[]
+  features?: string; // JSON stringified string[]
+  careInstructions?: string; // JSON stringified string[]
+  shipping?: string;
+  isDigitalProduct?: boolean;
+  published: boolean;
+  sortOrder: number;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface CartItem {
