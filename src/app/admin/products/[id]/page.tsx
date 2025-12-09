@@ -11,7 +11,7 @@ interface ProductForm {
   description: string;
   longDescription: string;
   price: string;
-  category: "tops" | "headwear" | "accessories";
+  category: "tops" | "headwear" | "accessories" | "digital";
   badge: "" | "Bestseller" | "New";
   image: string;
   colors: ColorVariant[];
@@ -320,6 +320,7 @@ export default function EditProduct() {
                     <option value="tops">Tops</option>
                     <option value="headwear">Headwear</option>
                     <option value="accessories">Accessories</option>
+                    <option value="digital">Digital</option>
                   </select>
                 </div>
               </div>

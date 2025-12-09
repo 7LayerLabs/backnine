@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-export type Category = "all" | "headwear" | "tops" | "accessories";
+export type Category = "all" | "headwear" | "tops" | "accessories" | "digital";
 export type SubFilter = "polos" | "hoodies" | null;
 
 interface ShopFilterContextType {

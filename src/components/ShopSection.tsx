@@ -69,12 +69,13 @@ export default function ShopSection() {
     return true;
   });
 
-  // Categories in order: All, Headwear, Tops, Accessories
+  // Categories in order: All, Headwear, Tops, Accessories, Digital
   const categories: { value: Category; label: string }[] = [
     { value: "all", label: "All" },
     { value: "headwear", label: "Headwear" },
     { value: "tops", label: "Tops" },
     { value: "accessories", label: "Accessories" },
+    { value: "digital", label: "Digital" },
   ];
 
   const handleQuickView = (product: Product, color?: ColorVariant) => {

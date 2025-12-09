@@ -222,51 +222,6 @@ export async function POST(request: NextRequest) {
 
         console.log(`Order confirmation email sent to ${customerEmail}`);
 
-        // Send Rocky Roast email if this is a digital roast purchase
-        if (isRockyRoast) {
-          // Reconstruct the roast message from metadata parts
-          const roastMessage = [
-            fullSession.metadata?.roastMessage || "",
-            fullSession.metadata?.roastMessagePart2 || "",
-            fullSession.metadata?.roastMessagePart3 || "",
-            fullSession.metadata?.roastMessagePart4 || "",
-          ].join("");
-
-          // Convert newlines to <br> tags and wrap in paragraphs
-          const formattedRoast = roastMessage
-            .split("\n\n")
-            .filter(p => p.trim())
-            .map(p => `<p style="font-size: 18px; line-height: 1.8; margin-bottom: 25px;">${p.replace(/\n/g, "<br>")}</p>`)
-            .join("");
-
-          // Send the roast email to Rocky
-          await resend.emails.send({
-            from: "Back Nine Apparel <hello@backnineshop.com>",
-            to: "rrburke2018@gmail.com",
-            subject: "Someone Paid Real Money to Tell You This",
-            html: `
-              <!DOCTYPE html>
-              <html>
-              <head><meta charset="utf-8"></head>
-              <body style="font-family: Georgia, serif; padding: 40px; background: #1a1a1a; color: #e5e5e5;">
-                <div style="max-width: 600px; margin: 0 auto; background: #0d0d0d; padding: 40px; border-radius: 8px; border: 1px solid #333;">
-
-                  ${formattedRoast}
-
-                  <p style="font-size: 18px; line-height: 1.8; font-style: italic; color: #888; margin-top: 40px;">
-                    — Delivered by Back Nine Apparel<br>
-                    <span style="font-size: 14px;">Someone paid $1 to send you this. Let that sink in.</span>
-                  </p>
-
-                </div>
-              </body>
-              </html>
-            `,
-          });
-
-          console.log(`Rocky Roast email sent!`);
-        }
-
         // Mark any abandoned cart as recovered
         try {
           const cartsResult = await adminDb.query({ abandonedCarts: {} });
@@ -291,6 +246,67 @@ export async function POST(request: NextRequest) {
         } catch (cartError) {
           // Non-critical - just log it
           console.error("Failed to mark abandoned cart as recovered:", cartError);
+        }
+      }
+
+      // Send Rocky Roast email if this is a digital roast purchase
+      // NOTE: This is OUTSIDE the customerEmail check to ensure Rocky always gets his roast
+      if (isRockyRoast) {
+        // Reconstruct the roast message from metadata parts
+        const roastMessage = [
+          fullSession.metadata?.roastMessage || "",
+          fullSession.metadata?.roastMessagePart2 || "",
+          fullSession.metadata?.roastMessagePart3 || "",
+          fullSession.metadata?.roastMessagePart4 || "",
+        ].join("");
+
+        console.log(`Attempting to send Rocky Roast email. Message length: ${roastMessage.length}`);
+
+        // Convert newlines to <br> tags and wrap in paragraphs
+        const formattedRoast = roastMessage
+          .split("\n\n")
+          .filter(p => p.trim())
+          .map(p => `<p style="font-size: 18px; line-height: 1.8; margin-bottom: 25px;">${p.replace(/\n/g, "<br>")}</p>`)
+          .join("");
+
+        try {
+          // Send the roast email to Rocky
+          const rockyEmailResult = await resend.emails.send({
+            from: "Back Nine Apparel <hello@backnineshop.com>",
+            to: "rrburke2018@gmail.com",
+            subject: "Someone Paid Real Money to Tell You This",
+            html: `
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="utf-8"></head>
+              <body style="font-family: Georgia, serif; padding: 40px; background: #1a1a1a; color: #e5e5e5;">
+                <div style="max-width: 600px; margin: 0 auto; background: #0d0d0d; padding: 40px; border-radius: 8px; border: 1px solid #333;">
+
+                  ${formattedRoast}
+
+                  <p style="font-size: 18px; line-height: 1.8; font-style: italic; color: #888; margin-top: 40px;">
+                    — Delivered by Back Nine Apparel<br>
+                    <span style="font-size: 14px;">Someone paid $1 to send you this. Let that sink in.</span>
+                  </p>
+
+                </div>
+              </body>
+              </html>
+            `,
+          });
+
+          console.log(`Rocky Roast email sent successfully! Resend ID: ${rockyEmailResult.data?.id}`);
+        } catch (rockyEmailError) {
+          console.error(`Failed to send Rocky Roast email:`, rockyEmailError);
+          await logError({
+            error: rockyEmailError,
+            context: "rocky-roast-email",
+            severity: "high",
+            metadata: {
+              sessionId: session.id,
+              roastMessageLength: roastMessage.length,
+            },
+          });
         }
       }
     } catch (error) {

@@ -15,7 +15,7 @@ export interface Product {
   longDescription?: string;
   price: number;
   image: string;
-  category: "tops" | "headwear" | "accessories";
+  category: "tops" | "headwear" | "accessories" | "digital";
   badge?: "Bestseller" | "New" | "";
   colors?: string; // JSON stringified ColorVariant[]
   sizes?: string; // JSON stringified string[]

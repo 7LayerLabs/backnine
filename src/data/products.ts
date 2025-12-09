@@ -12,7 +12,7 @@ export interface Product {
   description: string;
   price: number;
   image: string;
-  category: "tops" | "headwear" | "accessories";
+  category: "tops" | "headwear" | "accessories" | "digital";
   badge?: "Bestseller" | "New";
   colors?: ColorVariant[];
   // Detailed product info
