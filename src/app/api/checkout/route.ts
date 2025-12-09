@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { logError } from "@/lib/error-logger";
-import { products } from "@/data/products";
+import { products as staticProducts } from "@/data/products";
+import { adminDb } from "@/lib/instant-admin";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover", // Ensure this matches your Stripe dashboard version or keep as is
+  apiVersion: "2025-11-17.clover",
 });
 
 interface CartItem {
@@ -15,8 +16,15 @@ interface CartItem {
   quantity: number;
   size: string;
   color?: string;
-  // Metadata for Rocky Roast or other custom items
   roastMessage?: string;
+}
+
+interface DbProduct {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  isDigitalProduct?: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -30,6 +38,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Fetch products from database
+    const dbData = await adminDb.query({ products: {} });
+    const dbProducts = (dbData?.products || []) as DbProduct[];
+
     // Create line items for Stripe with trustworthy prices
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
@@ -37,8 +49,32 @@ export async function POST(request: NextRequest) {
     const sessionMetadata: Record<string, string> = {};
 
     for (const item of items) {
-      // 1. Find the real product
-      const product = products.find((p) => p.id === item.productId);
+      // 1. Find the real product - check database first, then static file
+      let product: { id: string; name: string; price: number; image: string; isDigitalProduct?: boolean } | undefined;
+
+      // Check database products first
+      const dbProduct = dbProducts.find((p) => p.id === item.productId);
+      if (dbProduct) {
+        product = {
+          id: dbProduct.id,
+          name: dbProduct.name,
+          price: dbProduct.price,
+          image: dbProduct.image,
+          isDigitalProduct: dbProduct.isDigitalProduct,
+        };
+      } else {
+        // Fall back to static products
+        const staticProduct = staticProducts.find((p) => p.id === item.productId);
+        if (staticProduct) {
+          product = {
+            id: staticProduct.id,
+            name: staticProduct.name,
+            price: staticProduct.price,
+            image: staticProduct.image,
+            isDigitalProduct: staticProduct.id === "rocky-roast",
+          };
+        }
+      }
 
       if (!product) {
         console.error(`Attempt to purchase invalid product: ${item.productId}`);
