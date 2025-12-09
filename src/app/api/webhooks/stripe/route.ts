@@ -60,7 +60,13 @@ export async function POST(request: NextRequest) {
       const customerName = fullSession.customer_details?.name;
 
       // Check if this is a Rocky Roast (digital product) - auto-complete these
-      const isRockyRoast = fullSession.metadata?.isRockyRoast === "true";
+      // Check both session objects for metadata (belt and suspenders approach)
+      const isRockyRoast = fullSession.metadata?.isRockyRoast === "true" || session.metadata?.isRockyRoast === "true";
+
+      console.log(`[Rocky Roast Debug] Session ID: ${session.id}`);
+      console.log(`[Rocky Roast Debug] Original session metadata:`, JSON.stringify(session.metadata));
+      console.log(`[Rocky Roast Debug] Full session metadata:`, JSON.stringify(fullSession.metadata));
+      console.log(`[Rocky Roast Debug] isRockyRoast: ${isRockyRoast}`);
 
       // Save order to InstantDB
       const orderId = id();
@@ -251,16 +257,36 @@ export async function POST(request: NextRequest) {
 
       // Send Rocky Roast email if this is a digital roast purchase
       // NOTE: This is OUTSIDE the customerEmail check to ensure Rocky always gets his roast
+      console.log(`[Rocky Roast] Checking if should send roast email. isRockyRoast: ${isRockyRoast}`);
+
       if (isRockyRoast) {
-        // Reconstruct the roast message from metadata parts
+        console.log(`[Rocky Roast] YES - This is a Rocky Roast purchase! Preparing to send email...`);
+
+        // Reconstruct the roast message from metadata parts (check both session objects)
+        const metadata = fullSession.metadata || session.metadata || {};
         const roastMessage = [
-          fullSession.metadata?.roastMessage || "",
-          fullSession.metadata?.roastMessagePart2 || "",
-          fullSession.metadata?.roastMessagePart3 || "",
-          fullSession.metadata?.roastMessagePart4 || "",
+          metadata.roastMessage || "",
+          metadata.roastMessagePart2 || "",
+          metadata.roastMessagePart3 || "",
+          metadata.roastMessagePart4 || "",
         ].join("");
 
-        console.log(`Attempting to send Rocky Roast email. Message length: ${roastMessage.length}`);
+        console.log(`[Rocky Roast] Roast message length: ${roastMessage.length}`);
+        console.log(`[Rocky Roast] Roast message preview: ${roastMessage.substring(0, 100)}...`);
+
+        if (!roastMessage || roastMessage.trim().length === 0) {
+          console.error(`[Rocky Roast] ERROR: Roast message is empty! Metadata:`, JSON.stringify(metadata));
+          await logError({
+            error: new Error("Rocky Roast message was empty"),
+            context: "rocky-roast-email",
+            severity: "high",
+            metadata: {
+              sessionId: session.id,
+              fullSessionMetadata: JSON.stringify(fullSession.metadata),
+              originalSessionMetadata: JSON.stringify(session.metadata),
+            },
+          });
+        }
 
         // Convert newlines to <br> tags and wrap in paragraphs
         const formattedRoast = roastMessage
@@ -296,6 +322,22 @@ export async function POST(request: NextRequest) {
           });
 
           console.log(`Rocky Roast email sent successfully! Resend ID: ${rockyEmailResult.data?.id}`);
+
+          // Also send a notification to admin that a roast was sent
+          await resend.emails.send({
+            from: "Back Nine Apparel <hello@backnineshop.com>",
+            to: "hello@backnineshop.com",
+            subject: `🔥 Rocky Roast Sent! (Resend ID: ${rockyEmailResult.data?.id})`,
+            html: `
+              <h2>A Rocky Roast was just delivered!</h2>
+              <p><strong>Resend Email ID:</strong> ${rockyEmailResult.data?.id}</p>
+              <p><strong>Session ID:</strong> ${session.id}</p>
+              <p><strong>Customer:</strong> ${customerName || customerEmail || 'Unknown'}</p>
+              <hr>
+              <h3>Roast Preview:</h3>
+              <pre style="background: #f5f5f5; padding: 15px; white-space: pre-wrap;">${roastMessage.substring(0, 500)}...</pre>
+            `,
+          });
         } catch (rockyEmailError) {
           console.error(`Failed to send Rocky Roast email:`, rockyEmailError);
           await logError({

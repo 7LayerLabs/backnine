@@ -8,6 +8,8 @@ import { db, Product } from "@/lib/instant";
 export default function AdminProducts() {
   const { isLoading, data } = db.useQuery({ products: {} });
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const products = (data?.products || []) as Product[];
   const sortedProducts = [...products].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
@@ -43,6 +45,78 @@ export default function AdminProducts() {
     } catch (error) {
       console.error("Failed to update product:", error);
     }
+  };
+
+  const moveProduct = async (productId: string, direction: "up" | "down") => {
+    const currentIndex = sortedProducts.findIndex((p) => p.id === productId);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= sortedProducts.length) return;
+
+    setSaving(true);
+    try {
+      const currentProduct = sortedProducts[currentIndex];
+      const swapProduct = sortedProducts[newIndex];
+
+      // Swap sort orders
+      await db.transact([
+        db.tx.products[currentProduct.id].update({ sortOrder: swapProduct.sortOrder || newIndex }),
+        db.tx.products[swapProduct.id].update({ sortOrder: currentProduct.sortOrder || currentIndex }),
+      ]);
+    } catch (error) {
+      console.error("Failed to reorder products:", error);
+    }
+    setSaving(false);
+  };
+
+  const handleDragStart = (e: React.DragEvent, productId: string) => {
+    setDraggedId(productId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      return;
+    }
+
+    const draggedIndex = sortedProducts.findIndex((p) => p.id === draggedId);
+    const targetIndex = sortedProducts.findIndex((p) => p.id === targetId);
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedId(null);
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Create new order array
+      const newOrder = [...sortedProducts];
+      const [draggedProduct] = newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedProduct);
+
+      // Update all sort orders
+      const transactions = newOrder.map((product, index) =>
+        db.tx.products[product.id].update({ sortOrder: index })
+      );
+
+      await db.transact(transactions);
+    } catch (error) {
+      console.error("Failed to reorder products:", error);
+    }
+    setSaving(false);
+    setDraggedId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
   };
 
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
@@ -86,6 +160,14 @@ export default function AdminProducts() {
           </div>
         </div>
 
+        {/* Saving indicator */}
+        {saving && (
+          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
+            <span className="text-sm text-blue-700">Saving order...</span>
+          </div>
+        )}
+
         {/* Products Grid */}
         {sortedProducts.length === 0 ? (
           <div className="bg-white rounded-lg p-12 text-center">
@@ -111,6 +193,7 @@ export default function AdminProducts() {
             <table className="w-full">
               <thead className="bg-stone-50 border-b border-stone-200">
                 <tr>
+                  <th className="w-20 text-left px-4 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Order</th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Product</th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Category</th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wide">Price</th>
@@ -120,8 +203,49 @@ export default function AdminProducts() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {sortedProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-stone-50">
+                {sortedProducts.map((product, index) => (
+                  <tr
+                    key={product.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, product.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, product.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`hover:bg-stone-50 ${
+                      draggedId === product.id ? "opacity-50 bg-blue-50" : ""
+                    } ${draggedId && draggedId !== product.id ? "border-t-2 border-transparent hover:border-blue-400" : ""}`}
+                  >
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-1">
+                        {/* Drag handle */}
+                        <div className="cursor-grab active:cursor-grabbing p-1 text-stone-400 hover:text-stone-600">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+                          </svg>
+                        </div>
+                        {/* Up/Down arrows */}
+                        <div className="flex flex-col">
+                          <button
+                            onClick={() => moveProduct(product.id, "up")}
+                            disabled={index === 0 || saving}
+                            className="p-0.5 text-stone-400 hover:text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => moveProduct(product.id, "down")}
+                            disabled={index === sortedProducts.length - 1 || saving}
+                            className="p-0.5 text-stone-400 hover:text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-stone-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -158,7 +282,7 @@ export default function AdminProducts() {
                     <td className="px-6 py-4">
                       <button
                         onClick={() => togglePublished(product)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 ${
                           product.published
                             ? "bg-emerald-100 text-emerald-800"
                             : "bg-stone-100 text-stone-600"
@@ -170,7 +294,7 @@ export default function AdminProducts() {
                     <td className="px-6 py-4">
                       <button
                         onClick={() => toggleAvailable(product)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 ${
                           product.available !== false
                             ? "bg-blue-100 text-blue-800"
                             : "bg-amber-100 text-amber-800"
@@ -213,13 +337,12 @@ export default function AdminProducts() {
 
         {/* Help Text */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-2">How to add products:</h3>
+          <h3 className="font-medium text-blue-900 mb-2">How to manage products:</h3>
           <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-            <li>Click &quot;Add Product&quot; and fill in the details</li>
-            <li>Upload product images</li>
-            <li>Add sizes and color variants</li>
-            <li>Set the price and publish when ready</li>
-            <li>Add the same product to Stripe with matching name/price</li>
+            <li>Drag rows or use arrows to reorder products on the site</li>
+            <li>Click &quot;Published&quot;/&quot;Draft&quot; to show/hide on store</li>
+            <li>Click &quot;In Stock&quot;/&quot;Unavailable&quot; to toggle availability</li>
+            <li>Add matching products to Stripe with same name/price</li>
           </ol>
         </div>
       </div>
