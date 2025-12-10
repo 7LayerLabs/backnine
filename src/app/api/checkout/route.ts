@@ -108,17 +108,26 @@ export async function POST(request: NextRequest) {
         if (chunks[3]) sessionMetadata.roastMessagePart4 = chunks[3];
       }
 
+      // Build image URL - Stripe requires publicly accessible URLs
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.backnineshop.com";
+      let imageUrl: string | undefined;
+
+      if (product.image.startsWith("http")) {
+        imageUrl = product.image;
+      } else {
+        // Encode the path to handle spaces and special characters
+        const encodedPath = product.image.split('/').map(segment => encodeURIComponent(segment)).join('/');
+        imageUrl = `${baseUrl}${encodedPath}`;
+      }
+
       lineItems.push({
         price_data: {
           currency: "usd",
           product_data: {
             name: product.name,
             description: `Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ""}`,
-            images: [
-              product.image.startsWith("http")
-                ? product.image
-                : `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3002"}${product.image}`
-            ],
+            // Only include images if we have a valid production URL (Stripe can't access localhost)
+            ...(baseUrl.includes("localhost") ? {} : { images: [imageUrl] }),
             metadata: {
               productId: product.id,
               size: item.size,
