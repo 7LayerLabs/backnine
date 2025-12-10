@@ -89,6 +89,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
       const data = await response.json();
 
+      if (!response.ok) {
+        console.error("Checkout API error:", data);
+        throw new Error(data.details || data.error || "Checkout failed");
+      }
+
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -96,7 +101,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      alert("Something went wrong. Please try again.");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      alert(`Something went wrong: ${message}. Please try again or contact support.`);
     } finally {
       setIsLoading(false);
     }

@@ -29,7 +29,10 @@ interface DbProduct {
 
 export async function POST(request: NextRequest) {
   try {
-    const { items } = (await request.json()) as { items: CartItem[] };
+    const { items, customerEmail } = (await request.json()) as {
+      items: CartItem[];
+      customerEmail?: string;
+    };
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -39,8 +42,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch products from database
-    const dbData = await adminDb.query({ products: {} });
-    const dbProducts = (dbData?.products || []) as DbProduct[];
+    let dbProducts: DbProduct[] = [];
+    try {
+      const dbData = await adminDb.query({ products: {} });
+      dbProducts = (dbData?.products || []) as DbProduct[];
+    } catch (dbError) {
+      console.error("Database query failed, using static products only:", dbError);
+    }
 
     // Create line items for Stripe with trustworthy prices
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -132,10 +140,11 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card", "klarna"],
+      payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
       allow_promotion_codes: true,
+      customer_email: customerEmail,
       success_url: `${request.headers.get("origin")}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${request.headers.get("origin")}/checkout/cancel`,
       shipping_address_collection: {
@@ -188,14 +197,21 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Checkout error details:", errorMessage);
+
     await logError({
       error,
       context: "checkout",
       severity: "high",
-      metadata: { stage: "create-session" },
+      metadata: {
+        stage: "create-session",
+        errorMessage,
+        stripeError: error instanceof Error && 'type' in error ? (error as unknown as { type: string }).type : undefined,
+      },
     });
     return NextResponse.json(
-      { error: "Failed to create checkout session" },
+      { error: "Failed to create checkout session", details: errorMessage },
       { status: 500 }
     );
   }

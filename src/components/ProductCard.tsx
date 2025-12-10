@@ -24,8 +24,8 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
   const maxVisibleColors = 5;
   const hasMoreColors = product.colors && product.colors.length > maxVisibleColors;
 
-  // Check if this is the Rocky Roast product
-  const isRockyRoast = product.id === "rocky-roast";
+  // Check if this is the Rocky Roast product (check both id and name for database/static compatibility)
+  const isRockyRoast = product.id === "rocky-roast" || product.name === "Rocky Roast";
 
   // Check if product is available for purchase
   const isUnavailable = product.available === false;
