@@ -80,7 +80,7 @@ export async function fulfillOrder(
 
   // Group items by fulfillment provider
   const printifyItems: { productId: string; variantId: number; quantity: number }[] = [];
-  const printfulItems: { syncVariantId: number; quantity: number }[] = [];
+  const printfulItems: { syncVariantId?: number; sku?: string; quantity: number }[] = [];
   const skippedItems: string[] = [];
 
   for (const item of items) {
@@ -132,11 +132,19 @@ export async function fulfillOrder(
         variantId: variant.printifyVariantId,
         quantity: item.quantity,
       });
-    } else if (mapping.provider === 'printful' && variant.printfulSyncVariantId) {
-      printfulItems.push({
-        syncVariantId: variant.printfulSyncVariantId,
-        quantity: item.quantity,
-      });
+    } else if (mapping.provider === 'printful') {
+      // Printful items can use either sync_variant_id or SKU
+      if (variant.printfulSku) {
+        printfulItems.push({
+          sku: variant.printfulSku,
+          quantity: item.quantity,
+        });
+      } else if (variant.printfulSyncVariantId) {
+        printfulItems.push({
+          syncVariantId: variant.printfulSyncVariantId,
+          quantity: item.quantity,
+        });
+      }
     }
   }
 
@@ -198,10 +206,12 @@ export async function fulfillOrder(
         shippingAddress
       );
 
-      const printfulOrderItems = printfulItems.map(item => ({
-        sync_variant_id: item.syncVariantId,
-        quantity: item.quantity,
-      }));
+      const printfulOrderItems = printfulItems.map(item => {
+        if (item.sku) {
+          return { sku: item.sku, quantity: item.quantity };
+        }
+        return { sync_variant_id: item.syncVariantId, quantity: item.quantity };
+      });
 
       const printfulOrder = await createPrintfulOrder(
         `BN-${orderId}`,

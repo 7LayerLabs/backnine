@@ -16,7 +16,8 @@ interface PrintfulRecipient {
 }
 
 interface PrintfulOrderItem {
-  sync_variant_id: number;
+  sync_variant_id?: number;
+  sku?: string;
   quantity: number;
 }
 

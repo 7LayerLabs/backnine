@@ -16,6 +16,7 @@ export interface VariantMapping {
   size?: string;
   printifyVariantId?: number;
   printfulSyncVariantId?: number;
+  printfulSku?: string; // For products identified by SKU
 }
 
 // =============================================================================
@@ -34,26 +35,18 @@ const beanieMapping: ProductMapping = {
   ],
 };
 
-// Golf Rope Cap - Printful (multiple product IDs, one per color)
-const golfRopeCapMapping: ProductMapping = {
-  websiteProductId: 'golf-rope-cap',
+// Classic Rope Hat - Printful (using SKUs to identify each design)
+const ropeCapMapping: ProductMapping = {
+  websiteProductId: 'rope-cap-white-green',
   provider: 'printful',
-  printfulProductId: 407475177, // Using first one as reference
+  printfulProductId: 0, // Multiple products, use SKU to identify
   variants: [
-    { color: 'Navy/Mint', printfulSyncVariantId: 5106604601 },
-    { color: 'Black/White', printfulSyncVariantId: 5106603794 },
-  ],
-};
-
-// Classic Rope Cap - Printful (multiple product IDs, one per color)
-const classicRopeCapMapping: ProductMapping = {
-  websiteProductId: 'classic-rope-cap',
-  provider: 'printful',
-  printfulProductId: 407475298, // Using first one as reference
-  variants: [
-    { color: 'White/Black', printfulSyncVariantId: 5106605285 },
-    { color: 'Black/White', printfulSyncVariantId: 5106604861 },
-    { color: 'Light Blue/White', printfulSyncVariantId: 5106604637 },
+    { color: 'White/Green', printfulSku: '693df55ba3e9a1' },
+    { color: 'White/Blue', printfulSku: '693df5ad26e1d4' },
+    { color: 'Navy/Blue', printfulSku: '693df5f3c32ac9' },
+    { color: 'Black/Teal', printfulSku: '693df586aaf016' },
+    { color: 'Black/Gold', printfulSku: '693df53bee5603' },
+    { color: 'Navy/Sunset', printfulSku: '693df4ff59a748' },
   ],
 };
 
@@ -534,8 +527,7 @@ const rockyRoastMapping: ProductMapping = {
 export const productMappings: ProductMapping[] = [
   // Printful (Headwear)
   beanieMapping,
-  golfRopeCapMapping,
-  classicRopeCapMapping,
+  ropeCapMapping,
   parTeeHoodieMapping,
   // Printify (Apparel)
   hoodieMapping,
@@ -557,7 +549,7 @@ export function getVariantId(
   websiteProductId: string,
   color: string,
   size?: string
-): { provider: FulfillmentProvider; variantId: number; productId: string | number } | null {
+): { provider: FulfillmentProvider; variantId: number; productId: string | number; sku?: string } | null {
   const mapping = getProductMapping(websiteProductId);
 
   if (!mapping || mapping.provider === 'none') {
@@ -580,6 +572,7 @@ export function getVariantId(
       provider: 'printful',
       variantId: variant.printfulSyncVariantId || 0,
       productId: mapping.printfulProductId || 0,
+      sku: variant.printfulSku,
     };
   }
 
