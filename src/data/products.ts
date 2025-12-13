@@ -224,16 +224,6 @@ export const products: Product[] = [
       { name: "White", hex: "#f5f5f5", image: "/sellable items/BackNine Polo/polo-white-r.jpg" },
       { name: "Light Blue", hex: "#add8e6", image: "/sellable items/BackNine Polo/polo-light-blue.jpg" },
       { name: "Grey", hex: "#808080", image: "/sellable items/BackNine Polo/polo-grey.jpg" },
-      { name: "Charcoal", hex: "#4a4a4a", image: "/sellable items/BackNine Polo/polo-charcoal.jpg" },
-      { name: "Black", hex: "#1a1a1a", image: "/sellable items/BackNine Polo/polo-black-r.jpg" },
-      { name: "Navy", hex: "#1a3a5c", image: "/sellable items/BackNine Polo/polo-navy.jpg" },
-      { name: "Royal Blue", hex: "#4169e1", image: "/sellable items/BackNine Polo/polo-royal-blue.jpg" },
-      { name: "Turquoise", hex: "#40e0d0", image: "/sellable items/BackNine Polo/polo-turquoise.jpg" },
-      { name: "Green", hex: "#2d5a27", image: "/sellable items/BackNine Polo/polo-green.jpg" },
-      { name: "Purple", hex: "#6b3fa0", image: "/sellable items/BackNine Polo/polo-purple.jpg" },
-      { name: "Maroon", hex: "#800000", image: "/sellable items/BackNine Polo/polo-maroon.jpg" },
-      { name: "Burgundy", hex: "#722f37", image: "/sellable items/BackNine Polo/polo-burgundy.jpg" },
-      { name: "Red", hex: "#cc0000", image: "/sellable items/BackNine Polo/polo-red.jpg" },
     ],
     longDescription: "Lightweight performance polo designed for movement and long days in the sun. The breathable polyester keeps its shape and dries fast, while PosiCharge color-locking technology holds vibrant tones through repeated washes. A clean flat knit collar and three-button placket give it a tidy, sporty look. Wear it for active workdays, weekend rounds of golf, or layered under a jacket.",
     features: [
@@ -258,9 +248,7 @@ export const products: Product[] = [
     category: "tops",
     colors: [
       { name: "Charcoal", hex: "#4a4a4a", image: "/sellable items/BackNine Pullover/pullover-charcoal.jpg" },
-      { name: "Slate Grey", hex: "#708090", image: "/sellable items/BackNine Pullover/pullover-slate-grey.jpg" },
       { name: "Black", hex: "#1a1a1a", image: "/sellable items/BackNine Pullover/pullover-black.jpg" },
-      { name: "Carolina Blue", hex: "#99badd", image: "/sellable items/BackNine Pullover/pullover-carolina-blue.jpg" },
       { name: "Royal Blue", hex: "#4169e1", image: "/sellable items/BackNine Pullover/pullover-royal-blue.jpg" },
       { name: "Forest Green", hex: "#228b22", image: "/sellable items/BackNine Pullover/pullover-forest-green.jpg" },
       { name: "Maroon", hex: "#800000", image: "/sellable items/BackNine Pullover/pullover-maroon.jpg" },
@@ -289,7 +277,6 @@ export const products: Product[] = [
     category: "tops",
     colors: [
       { name: "Charcoal", hex: "#4a4a4a", image: "/sellable items/BackNine Quarter Zip/quarter-zip-charcoal.jpg" },
-      { name: "White", hex: "#f5f5f5", image: "/sellable items/BackNine Quarter Zip/quarter-zip-white.jpg" },
     ],
     longDescription: "Engineered for performance and styled for versatility, this Back Nine Apparel quarter-zip pullover transitions seamlessly from the golf course to everyday wear. The Sport-Wick moisture-wicking fabric actively pulls sweat away from your body, keeping you cool and dry whether you're walking 18 holes or heading into a meeting. The four-way stretch fabric moves with your swing and recovers its shape.",
     features: [

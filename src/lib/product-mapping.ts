@@ -375,7 +375,6 @@ const poloMapping: ProductMapping = {
 };
 
 // Quarter Zip Pullover - Printify Product ID: 69252d69a40ed40385040c30
-// Website shows: Charcoal, White - Printify has Charcoal Grey but no White enabled
 const quarterZipMapping: ProductMapping = {
   websiteProductId: 'quarter-zip',
   provider: 'printify',
@@ -390,20 +389,11 @@ const quarterZipMapping: ProductMapping = {
     { color: 'Charcoal', size: '2XL', printifyVariantId: 123802 },
     { color: 'Charcoal', size: '3XL', printifyVariantId: 123803 },
     { color: 'Charcoal', size: '4XL', printifyVariantId: 123804 },
-    // White - NOT ENABLED in Printify, using Black as fallback
-    { color: 'White', size: 'XS', printifyVariantId: 123792 },
-    { color: 'White', size: 'S', printifyVariantId: 123772 },
-    { color: 'White', size: 'M', printifyVariantId: 123762 },
-    { color: 'White', size: 'L', printifyVariantId: 123752 },
-    { color: 'White', size: 'XL', printifyVariantId: 123782 },
-    { color: 'White', size: '2XL', printifyVariantId: 123722 },
-    { color: 'White', size: '3XL', printifyVariantId: 123732 },
-    { color: 'White', size: '4XL', printifyVariantId: 123742 },
   ],
 };
 
 // Pullover - Printify Product ID: 69252d69a40ed40385040c30 (same as quarter-zip)
-// Website shows: Charcoal, Slate Grey, Black, Carolina Blue, Royal Blue, Forest Green, Maroon, Red
+// Available colors: Charcoal, Black, Royal Blue, Forest Green, Maroon, Red
 const pulloverMapping: ProductMapping = {
   websiteProductId: 'pullover',
   provider: 'printify',
