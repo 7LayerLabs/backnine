@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { Resend } from "resend";
 import { adminDb, tx, id } from "@/lib/instant-admin";
 import { logError } from "@/lib/error-logger";
+import { fulfillOrder } from "@/lib/fulfillment";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -283,6 +284,72 @@ export async function POST(request: NextRequest) {
           });
 
           console.log(`Order confirmation email sent to ${customerEmail}`);
+        }
+
+        // === FULFILLMENT: Route order to Printify/Printful ===
+        // Skip fulfillment for digital products (Rocky Roast)
+        if (!isRockyRoast && shipping) {
+          try {
+            console.log(`[Fulfillment] Starting fulfillment for order ${orderId}`);
+
+            const isExpressShipping = (session.shipping_cost?.amount_total || 0) > 0;
+
+            const fulfillmentResults = await fulfillOrder(
+              orderId,
+              orderItems,
+              customerName || '',
+              customerEmail || '',
+              {
+                name: shipping.name,
+                line1: shipping.address?.line1,
+                line2: shipping.address?.line2,
+                city: shipping.address?.city,
+                state: shipping.address?.state,
+                postal_code: shipping.address?.postal_code,
+                country: shipping.address?.country,
+              },
+              isExpressShipping
+            );
+
+            // Log fulfillment results
+            for (const result of fulfillmentResults) {
+              if (result.success) {
+                console.log(`[Fulfillment] ${result.provider} order created: ${result.orderId}`);
+              } else {
+                console.error(`[Fulfillment] ${result.provider} order failed: ${result.error}`);
+              }
+            }
+
+            // Update order with fulfillment status
+            const successfulFulfillments = fulfillmentResults.filter(r => r.success);
+            if (successfulFulfillments.length > 0) {
+              await adminDb.transact([
+                tx.orders[orderId].update({
+                  fulfillmentStatus: 'submitted',
+                  fulfillmentProviders: JSON.stringify(
+                    successfulFulfillments.map(r => ({
+                      provider: r.provider,
+                      orderId: r.orderId,
+                    }))
+                  ),
+                }),
+              ]);
+              console.log(`[Fulfillment] Order ${orderId} fulfillment status updated`);
+            }
+          } catch (fulfillmentError) {
+            console.error('[Fulfillment] Error:', fulfillmentError);
+            await logError({
+              error: fulfillmentError,
+              context: 'fulfillment',
+              severity: 'high',
+              metadata: {
+                orderId,
+                sessionId: session.id,
+              },
+            });
+            // Don't fail the webhook - order is saved, just fulfillment failed
+            // Can be manually retried from admin
+          }
         }
 
         // Mark any abandoned cart as recovered
