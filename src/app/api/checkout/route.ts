@@ -120,11 +120,20 @@ export async function POST(request: NextRequest) {
         imageUrl = `${baseUrl}${encodedPath}`;
       }
 
+      // Build product name with color and size for fulfillment parsing
+      const productNameWithVariant = item.color && item.size
+        ? `${product.name} - ${item.color} - ${item.size}`
+        : item.color
+        ? `${product.name} - ${item.color}`
+        : item.size
+        ? `${product.name} - ${item.size}`
+        : product.name;
+
       lineItems.push({
         price_data: {
           currency: "usd",
           product_data: {
-            name: product.name,
+            name: productNameWithVariant,
             description: `Size: ${item.size}${item.color ? ` | Color: ${item.color}` : ""}`,
             // Only include images if we have a valid production URL (Stripe can't access localhost)
             ...(baseUrl.includes("localhost") ? {} : { images: [imageUrl] }),
