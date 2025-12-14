@@ -499,7 +499,7 @@ const golfTowelMapping: ProductMapping = {
   provider: 'printify',
   printifyProductId: '69228a2a7d60726e940f13d0',
   variants: [
-    { color: 'Default', size: '16\'\' x 24\'\'', printifyVariantId: 112488 },
+    { color: 'Default', size: 'One Size', printifyVariantId: 112488 },
   ],
 };
 

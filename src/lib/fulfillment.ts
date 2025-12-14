@@ -46,7 +46,7 @@ function parseLineItem(itemName: string): { productId: string; color: string; si
       if (parts.length >= 2) {
         // Last part might be size if it matches known sizes
         const lastPart = parts[parts.length - 1].trim();
-        const knownSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'One Size', 'One Size Fits Most'];
+        const knownSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'One Size', 'One Size Fits Most'];
 
         if (knownSizes.some(s => s.toLowerCase() === lastPart.toLowerCase())) {
           size = lastPart;
