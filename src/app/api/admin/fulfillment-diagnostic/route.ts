@@ -76,15 +76,8 @@ function parseLineItem(itemName: string): { productId: string; productName: stri
   return null;
 }
 
-export async function GET(request: NextRequest) {
-  // Check admin auth
-  const authHeader = request.headers.get("authorization");
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminPassword || authHeader !== `Bearer ${adminPassword}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export async function GET() {
+  // Admin layout handles authentication at page level
   const result: DiagnosticResult = {
     timestamp: new Date().toISOString(),
     envVars: {
@@ -218,13 +211,7 @@ export async function GET(request: NextRequest) {
 
 // POST: Test parsing for a specific order
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminPassword || authHeader !== `Bearer ${adminPassword}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  // Admin layout handles authentication at page level
   const { orderId } = await request.json();
 
   if (!orderId) {

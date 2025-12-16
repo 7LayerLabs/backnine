@@ -60,12 +60,7 @@ export default function FulfillmentDiagnostic() {
     setLoading(true);
     setError(null);
     try {
-      const password = sessionStorage.getItem("adminPassword");
-      const res = await fetch("/api/admin/fulfillment-diagnostic", {
-        headers: {
-          Authorization: `Bearer ${password}`,
-        },
-      });
+      const res = await fetch("/api/admin/fulfillment-diagnostic");
 
       if (!res.ok) {
         throw new Error(`Failed to run diagnostic: ${res.status}`);
@@ -86,12 +81,10 @@ export default function FulfillmentDiagnostic() {
     setOrderParseResult(null);
 
     try {
-      const password = sessionStorage.getItem("adminPassword");
       const res = await fetch("/api/admin/fulfillment-diagnostic", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${password}`,
         },
         body: JSON.stringify({ orderId }),
       });
