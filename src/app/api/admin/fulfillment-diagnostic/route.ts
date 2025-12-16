@@ -341,6 +341,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     orderId,
     items: parsingResults,
-    canFulfill: parsingResults.every(r => r.error === null || r.provider === 'none (digital product)'),
+    canFulfill: parsingResults.every(r => r.error === null),
   });
 }
