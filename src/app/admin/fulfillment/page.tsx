@@ -51,6 +51,49 @@ export default function FulfillmentDiagnostic() {
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
   const [orderParseResult, setOrderParseResult] = useState<OrderParseResult | null>(null);
   const [parsingOrder, setParsingOrder] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyForClaude = () => {
+    if (!diagnostic) return;
+
+    const text = `
+=== FULFILLMENT DIAGNOSTIC REPORT ===
+Timestamp: ${diagnostic.timestamp}
+
+--- ENVIRONMENT VARIABLES ---
+PRINTIFY_API_TOKEN: ${diagnostic.envVars.printifyToken ? "SET" : "MISSING"}
+PRINTIFY_SHOP_ID: ${diagnostic.envVars.printifyShopId || "NOT SET (using fallback)"}
+PRINTFUL_API_TOKEN: ${diagnostic.envVars.printfulToken ? "SET" : "MISSING"}
+
+--- API CONNECTION TESTS ---
+Printify: ${diagnostic.apiTests.printify.success ? "SUCCESS" : "FAILED"} - ${diagnostic.apiTests.printify.message}
+${diagnostic.apiTests.printify.shopInfo ? `  Shop ID: ${JSON.stringify(diagnostic.apiTests.printify.shopInfo)}` : ""}
+Printful: ${diagnostic.apiTests.printful.success ? "SUCCESS" : "FAILED"} - ${diagnostic.apiTests.printful.message}
+${diagnostic.apiTests.printful.storeInfo ? `  Store ID: ${JSON.stringify(diagnostic.apiTests.printful.storeInfo)}` : ""}
+
+--- PRODUCT MAPPING ---
+Mapped: ${diagnostic.productMappingStatus.mappedProducts} / ${diagnostic.productMappingStatus.totalProducts}
+Unmapped Products: ${diagnostic.productMappingStatus.unmappedProducts.length > 0 ? diagnostic.productMappingStatus.unmappedProducts.join(", ") : "None"}
+
+--- RECENT ORDERS ---
+${diagnostic.recentOrders?.map(o => `${o.orderId.slice(-8)} | Status: ${o.status} | Fulfillment: ${o.fulfillmentStatus || "none"} | ${new Date(o.createdAt).toLocaleDateString()}`).join("\n") || "No orders"}
+
+${orderParseResult ? `
+--- ORDER PARSING TEST: ${orderParseResult.orderId.slice(-8)} ---
+Can Fulfill: ${orderParseResult.canFulfill ? "YES" : "NO"}
+Items:
+${orderParseResult.items.map(i => `  - "${i.originalName}"
+    Product: ${i.parsedProduct || "NOT FOUND"}
+    Color: ${i.parsedColor || "-"} | Size: ${i.parsedSize || "-"}
+    Provider: ${i.provider || "-"} | Variant ID: ${i.variantId || "-"}
+    ${i.error ? `ERROR: ${i.error}` : "OK"}`).join("\n")}
+` : ""}
+`.trim();
+
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     runDiagnostic();
@@ -115,6 +158,12 @@ export default function FulfillmentDiagnostic() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-stone-800">Fulfillment Diagnostic</h1>
         <div className="flex gap-3">
+          <button
+            onClick={copyForClaude}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            {copied ? "Copied!" : "Copy for Claude"}
+          </button>
           <button
             onClick={runDiagnostic}
             className="px-4 py-2 bg-navy-800 text-white rounded-lg hover:bg-navy-900"
