@@ -13,7 +13,7 @@
     "@instantdb/react": "^0.22.76",
     "@stripe/stripe-js": "^8.5.3",
     "@vercel/blob": "^2.0.0",
-    "next": "16.0.7",
+    "next": "16.0.10",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "resend": "^6.5.2",
