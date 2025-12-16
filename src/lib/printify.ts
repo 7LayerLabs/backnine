@@ -2,7 +2,16 @@
 // Handles order fulfillment for: Hoodies, Sweatshirts, T-Shirts, Polos, Pullovers, Golf Towel
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
-const PRINTIFY_SHOP_ID = '25407792'; // Etsy shop with products
+
+// Use environment variable for shop ID, with fallback to legacy hardcoded value
+function getPrintifyShopId(): string {
+  const shopId = process.env.PRINTIFY_SHOP_ID;
+  if (!shopId) {
+    console.warn('[Printify] PRINTIFY_SHOP_ID env var not set, using fallback');
+    return '25407792'; // Legacy fallback
+  }
+  return shopId;
+}
 
 interface PrintifyAddress {
   first_name: string;
@@ -60,7 +69,7 @@ export async function createPrintifyOrder(
   };
 
   const response = await fetch(
-    `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/orders.json`,
+    `${PRINTIFY_API_URL}/shops/${getPrintifyShopId()}/orders.json`,
     {
       method: 'POST',
       headers: {
@@ -88,7 +97,7 @@ export async function getPrintifyProduct(productId: string) {
   }
 
   const response = await fetch(
-    `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products/${productId}.json`,
+    `${PRINTIFY_API_URL}/shops/${getPrintifyShopId()}/products/${productId}.json`,
     {
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -322,10 +322,12 @@ export async function POST(request: NextRequest) {
 
             // Update order with fulfillment status
             const successfulFulfillments = fulfillmentResults.filter(r => r.success);
+            const failedFulfillments = fulfillmentResults.filter(r => !r.success);
+
             if (successfulFulfillments.length > 0) {
               await adminDb.transact([
                 tx.orders[orderId].update({
-                  fulfillmentStatus: 'submitted',
+                  fulfillmentStatus: failedFulfillments.length > 0 ? 'partial' : 'submitted',
                   fulfillmentProviders: JSON.stringify(
                     successfulFulfillments.map(r => ({
                       provider: r.provider,
@@ -336,19 +338,89 @@ export async function POST(request: NextRequest) {
               ]);
               console.log(`[Fulfillment] Order ${orderId} fulfillment status updated`);
             }
+
+            // Handle failed fulfillments (items that couldn't be sent to POD)
+            if (failedFulfillments.length > 0 && successfulFulfillments.length === 0) {
+              // ALL items failed - this is critical
+              await adminDb.transact([
+                tx.orders[orderId].update({
+                  fulfillmentStatus: 'failed',
+                  fulfillmentError: failedFulfillments.map(f => f.error).join('; '),
+                }),
+              ]);
+
+              // Send alert email
+              await resend.emails.send({
+                from: "Back Nine Alerts <hello@backnineshop.com>",
+                to: "hello@backnineshop.com",
+                subject: `FULFILLMENT FAILED - Order ${orderId.slice(-8).toUpperCase()}`,
+                html: `
+                  <h2 style="color: #dc2626;">Fulfillment Failed!</h2>
+                  <p>An order was paid but could NOT be sent to Printify/Printful.</p>
+                  <p><strong>Order ID:</strong> ${orderId}</p>
+                  <p><strong>Customer:</strong> ${customerName || customerEmail}</p>
+                  <p><strong>Errors:</strong></p>
+                  <ul>${failedFulfillments.map(f => `<li>${f.provider}: ${f.error}</li>`).join('')}</ul>
+                  <p><strong>Items:</strong></p>
+                  <ul>${orderItems.map(item => `<li>${item.quantity}x ${item.name}</li>`).join('')}</ul>
+                  <hr>
+                  <p>Go to <a href="https://www.backnineshop.com/admin/orders">Admin Orders</a> to investigate.</p>
+                `,
+              });
+            } else if (failedFulfillments.length > 0) {
+              // Some items failed - partial fulfillment
+              console.warn(`[Fulfillment] Partial fulfillment for order ${orderId}:`, failedFulfillments);
+            }
           } catch (fulfillmentError) {
             console.error('[Fulfillment] Error:', fulfillmentError);
+
+            // Update order with failed fulfillment status
+            try {
+              await adminDb.transact([
+                tx.orders[orderId].update({
+                  fulfillmentStatus: 'failed',
+                  fulfillmentError: fulfillmentError instanceof Error ? fulfillmentError.message : 'Unknown error',
+                }),
+              ]);
+            } catch (updateError) {
+              console.error('[Fulfillment] Failed to update order status:', updateError);
+            }
+
+            // Log the error
             await logError({
               error: fulfillmentError,
               context: 'fulfillment',
-              severity: 'high',
+              severity: 'critical', // Upgraded to critical so it sends email
               metadata: {
                 orderId,
                 sessionId: session.id,
+                customerEmail: customerEmail || '',
+                itemCount: orderItems.length,
               },
             });
-            // Don't fail the webhook - order is saved, just fulfillment failed
-            // Can be manually retried from admin
+
+            // Send explicit fulfillment failure alert
+            try {
+              await resend.emails.send({
+                from: "Back Nine Alerts <hello@backnineshop.com>",
+                to: "hello@backnineshop.com",
+                subject: `FULFILLMENT FAILED - Order ${orderId.slice(-8).toUpperCase()}`,
+                html: `
+                  <h2 style="color: #dc2626;">Fulfillment Failed!</h2>
+                  <p>An order was paid but could NOT be sent to Printify/Printful.</p>
+                  <p><strong>Order ID:</strong> ${orderId}</p>
+                  <p><strong>Customer:</strong> ${customerName || customerEmail}</p>
+                  <p><strong>Error:</strong> ${fulfillmentError instanceof Error ? fulfillmentError.message : 'Unknown error'}</p>
+                  <p><strong>Items:</strong></p>
+                  <ul>${orderItems.map(item => `<li>${item.quantity}x ${item.name}</li>`).join('')}</ul>
+                  <hr>
+                  <p>Go to <a href="https://www.backnineshop.com/admin/orders">Admin Orders</a> to manually fulfill.</p>
+                  <p>Run diagnostic: <code>GET /api/admin/fulfillment-diagnostic</code></p>
+                `,
+              });
+            } catch (emailError) {
+              console.error('[Fulfillment] Failed to send alert email:', emailError);
+            }
           }
         }
 

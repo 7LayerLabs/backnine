@@ -251,17 +251,29 @@ export async function fulfillOrder(
     }
   }
 
-  // Log skipped items
+  // Log skipped items - upgraded to high severity for visibility
   if (skippedItems.length > 0) {
+    console.error(`[Fulfillment] SKIPPED ITEMS for order ${orderId}:`, skippedItems);
     await logError({
       error: new Error(`Items could not be fulfilled: ${skippedItems.join(', ')}`),
       context: 'fulfillment-skipped',
-      severity: 'medium',
+      severity: 'high', // Upgraded from medium - skipped items are a real problem
       metadata: {
         orderId,
         skippedItems,
+        totalItems: items.length,
+        skippedCount: skippedItems.length,
       },
     });
+
+    // If ALL items were skipped, add a failure result so the webhook knows
+    if (results.length === 0) {
+      results.push({
+        success: false,
+        provider: 'none' as FulfillmentProvider,
+        error: `All ${skippedItems.length} items could not be mapped to fulfillment providers: ${skippedItems.join(', ')}`,
+      });
+    }
   }
 
   return results;
