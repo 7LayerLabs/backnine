@@ -35,7 +35,7 @@ export default function LifestyleSection() {
               src="/apparel/marketing/b9mkt6.png"
               alt="Classic Collection"
               fill
-              className="object-cover transition-transform duration-700 group-hover:scale-103"
+              className="object-cover object-top transition-transform duration-700 group-hover:scale-103"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1A1208]/80 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 p-8">
@@ -53,12 +53,12 @@ export default function LifestyleSection() {
 
           {/* Right column — two stacked panels */}
           <div className="md:col-span-5 flex flex-col gap-4">
-            <div className="group relative overflow-hidden aspect-[4/3]">
+            <div className="group relative overflow-hidden aspect-[4/3.5]">
               <Image
                 src="/apparel/marketing/b9_mkt2.png"
                 alt="Par-Tee Time"
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-103"
+                className="object-cover object-top transition-transform duration-700 group-hover:scale-103"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1A1208]/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 left-0 p-6">
