@@ -8,26 +8,26 @@ export default function Hero() {
       {/* Full-bleed background image */}
       <div className="absolute inset-0">
         <Image
-          src="/apparel/marketing/rockygolf.png"
+          src="/apparel/marketing/b9_mkt1.png"
           alt="Back Nine — Golf lifestyle"
           fill
-          className="object-cover object-center"
+          className="object-cover object-top"
           priority
         />
-        {/* Gradient: dark at bottom for text legibility, slight tint at top for nav */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/75" />
+        {/* Strong gradient for legibility — heavier at bottom where text lives */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/85" />
       </div>
 
       {/* Content — bottom-left anchored, editorial style */}
-      <div className="relative z-10 flex flex-col justify-end min-h-screen pb-20 px-6 sm:px-12 max-w-7xl mx-auto">
+      <div className="relative z-10 flex flex-col justify-end min-h-screen pb-20 pt-32 px-6 sm:px-12 max-w-7xl mx-auto">
 
         {/* Eyebrow */}
-        <p className="text-[#C17D2A] text-xs tracking-[0.45em] uppercase font-montserrat font-semibold mb-4">
+        <p className="text-[#C17D2A] text-xs tracking-[0.45em] uppercase font-montserrat font-semibold mb-4 drop-shadow-md">
           Est. 2025 · Golf Apparel
         </p>
 
-        {/* Headline — large serif editorial */}
-        <h1 className="font-dm-serif text-5xl sm:text-7xl md:text-8xl text-[#F5F0E8] leading-[0.95] mb-6 max-w-3xl">
+        {/* Headline */}
+        <h1 className="font-dm-serif text-5xl sm:text-7xl md:text-8xl text-white leading-[0.95] mb-6 max-w-3xl drop-shadow-lg">
           The Back&nbsp;Nine
           <br />
           <span className="italic text-[#C17D2A]">Starts Here.</span>

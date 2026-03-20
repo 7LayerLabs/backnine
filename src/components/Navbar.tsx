@@ -34,18 +34,18 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-[#F5F0E8]/95 backdrop-blur-sm shadow-sm py-3 border-b border-[#D4C9B0]"
-            : "bg-transparent py-5"
+            ? "bg-[#2D5016] shadow-md py-3"
+            : "bg-[#2D5016] py-5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
 
           {/* Logo */}
           <Link href="/" className="flex flex-col leading-none">
-            <span className={`text-lg font-bold tracking-[0.2em] font-montserrat transition-colors ${isScrolled ? "text-[#2D5016]" : "text-[#F5F0E8]"}`}>
+            <span className="text-lg font-bold tracking-[0.2em] font-montserrat text-[#F5F0E8]">
               BACK NINE
             </span>
-            <span className={`text-[9px] tracking-[0.45em] uppercase font-inter transition-colors ${isScrolled ? "text-[#C17D2A]" : "text-[#C17D2A]"}`}>
+            <span className="text-[9px] tracking-[0.45em] uppercase font-inter text-[#C17D2A]">
               Apparel
             </span>
           </Link>
@@ -62,9 +62,7 @@ export default function Navbar() {
               <li key={label}>
                 <button
                   onClick={() => handleNavClick(cat, sub)}
-                  className={`text-sm font-medium tracking-wide transition-colors hover:text-[#C17D2A] ${
-                    isScrolled ? "text-[#1A1208]" : "text-[#F5F0E8]"
-                  }`}
+                  className="text-sm font-medium tracking-wide transition-colors hover:text-[#C17D2A] text-[#F5F0E8]"
                 >
                   {label}
                 </button>
@@ -73,9 +71,7 @@ export default function Navbar() {
             <li>
               <Link
                 href="#our-story"
-                className={`text-sm font-medium tracking-wide transition-colors hover:text-[#C17D2A] ${
-                  isScrolled ? "text-[#1A1208]" : "text-[#F5F0E8]"
-                }`}
+                className="text-sm font-medium tracking-wide transition-colors hover:text-[#C17D2A] text-[#F5F0E8]"
               >
                 Our Story
               </Link>
@@ -93,19 +89,19 @@ export default function Navbar() {
               ].map(({ href, label, path }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                   aria-label={label}
-                  className={`transition-colors hover:text-[#C17D2A] ${isScrolled ? "text-[#7A6E5F]" : "text-[#F5F0E8]/80"}`}
+                  className="transition-colors hover:text-[#C17D2A] text-[#F5F0E8]/80"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d={path} /></svg>
                 </a>
               ))}
             </div>
 
-            <div className={`hidden md:block w-px h-5 ${isScrolled ? "bg-[#D4C9B0]" : "bg-white/25"}`} />
+            <div className="hidden md:block w-px h-5 bg-white/25" />
 
             {/* Auth */}
             {user ? (
               <button onClick={() => db.auth.signOut()}
-                className={`hidden md:flex items-center gap-1.5 text-xs font-medium transition-colors hover:text-[#C17D2A] ${isScrolled ? "text-[#7A6E5F]" : "text-[#F5F0E8]/80"}`}
+                    className="hidden md:flex items-center gap-1.5 text-xs font-medium transition-colors hover:text-[#C17D2A] text-[#F5F0E8]/80"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
@@ -113,7 +109,7 @@ export default function Navbar() {
               </button>
             ) : (
               <button onClick={() => setAuthModal(true)}
-                className={`hidden md:block transition-colors hover:text-[#C17D2A] ${isScrolled ? "text-[#7A6E5F]" : "text-[#F5F0E8]/80"}`}
+                className="hidden md:block transition-colors hover:text-[#C17D2A] text-[#F5F0E8]/80"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -125,7 +121,7 @@ export default function Navbar() {
             <button onClick={() => setCartOpen(true)} className="relative">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                className={`transition-colors hover:text-[#C17D2A] ${isScrolled ? "text-[#1A1208]" : "text-[#F5F0E8]"}`}
+                className="transition-colors hover:text-[#C17D2A] text-[#F5F0E8]"
               >
                 <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
@@ -139,7 +135,7 @@ export default function Navbar() {
             {/* Mobile hamburger */}
             <button className="md:hidden flex flex-col gap-1.5" onClick={() => setMobileMenu(!isMobileMenuOpen)}>
               {[0, 1, 2].map(i => (
-                <span key={i} className={`block h-px w-6 transition-all ${isScrolled ? "bg-[#1A1208]" : "bg-[#F5F0E8]"} ${
+                <span key={i} className={`block h-px w-6 transition-all bg-[#F5F0E8] ${
                   i === 0 && isMobileMenuOpen ? "rotate-45 translate-y-2" :
                   i === 1 && isMobileMenuOpen ? "opacity-0" :
                   i === 2 && isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
