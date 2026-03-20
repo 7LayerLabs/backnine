@@ -3,52 +3,79 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section id="home" className="min-h-screen bg-white flex items-center relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-24 sm:py-20 w-full">
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="space-y-4 sm:space-y-6 order-2 md:order-1 text-center md:text-left">
-            <p className="text-xs sm:text-sm tracking-[0.3em] text-stone-500 uppercase font-montserrat">Est. 2025</p>
-            <h1 className="font-montserrat text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-stone-900 font-bold tracking-wide">
-              BACK NINE
-              <span className="block text-emerald-700">APPAREL</span>
-            </h1>
-            <p className="text-base sm:text-lg text-stone-600 max-w-md mx-auto md:mx-0 font-inter leading-relaxed">
-              Golf gear that goes from the course to the clubhouse. Look good. Play better. Finish strong.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4 items-center md:items-start">
-              <Link
-                href="#shop"
-                className="inline-block bg-stone-900 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm font-medium tracking-wide hover:bg-stone-800 transition-colors text-center"
-              >
-                Shop Collection
-              </Link>
-              <Link
-                href="#our-story"
-                className="inline-block border-2 border-stone-900 text-stone-900 px-6 sm:px-8 py-3 sm:py-4 text-sm font-medium tracking-wide hover:bg-stone-900 hover:text-white transition-colors text-center"
-              >
-                Our Story
-              </Link>
-            </div>
-          </div>
-          <div className="relative order-1 md:order-2">
-            <Image
-              src="/apparel/marketing/b9_mkt1.png"
-              alt="Back Nine Apparel - Premium Golf Lifestyle"
-              width={600}
-              height={700}
-              className="w-full h-auto object-cover rounded-sm shadow-2xl"
-              priority
-            />
-          </div>
+    <section id="home" className="relative min-h-screen overflow-hidden grain">
+
+      {/* Full-bleed background image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/apparel/marketing/rockygolf.png"
+          alt="Back Nine — Golf lifestyle"
+          fill
+          className="object-cover object-center"
+          priority
+        />
+        {/* Gradient: dark at bottom for text legibility, slight tint at top for nav */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/75" />
+      </div>
+
+      {/* Content — bottom-left anchored, editorial style */}
+      <div className="relative z-10 flex flex-col justify-end min-h-screen pb-20 px-6 sm:px-12 max-w-7xl mx-auto">
+
+        {/* Eyebrow */}
+        <p className="text-[#C17D2A] text-xs tracking-[0.45em] uppercase font-montserrat font-semibold mb-4">
+          Est. 2025 · Golf Apparel
+        </p>
+
+        {/* Headline — large serif editorial */}
+        <h1 className="font-dm-serif text-5xl sm:text-7xl md:text-8xl text-[#F5F0E8] leading-[0.95] mb-6 max-w-3xl">
+          The Back&nbsp;Nine
+          <br />
+          <span className="italic text-[#C17D2A]">Starts Here.</span>
+        </h1>
+
+        {/* Subline */}
+        <p className="text-[#F5F0E8]/75 text-base sm:text-lg font-inter max-w-md mb-10 leading-relaxed">
+          Golf gear that moves from the fairway to the 19th hole without missing a beat.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-wrap gap-4 items-center">
+          <Link
+            href="#shop"
+            className="inline-flex items-center gap-2 bg-[#C17D2A] hover:bg-[#A8681F] text-white text-sm font-semibold tracking-wide px-8 py-4 transition-colors font-montserrat"
+          >
+            Shop the Collection
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </Link>
+          <Link
+            href="#our-story"
+            className="inline-flex items-center gap-2 text-[#F5F0E8] border border-[#F5F0E8]/40 hover:border-[#F5F0E8] text-sm font-medium tracking-wide px-8 py-4 transition-colors font-montserrat"
+          >
+            Our Story
+          </Link>
+        </div>
+
+        {/* Scroll cue */}
+        <div className="hidden sm:flex items-center gap-3 mt-14 text-[#F5F0E8]/40">
+          <div className="w-8 h-px bg-[#F5F0E8]/30" />
+          <span className="text-[10px] tracking-[0.4em] uppercase font-inter">Scroll to explore</span>
         </div>
       </div>
-      <Link
-        href="#shop"
-        className="hidden sm:flex absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center text-stone-500 hover:text-stone-700 transition-colors"
-      >
-        <span className="text-xs tracking-widest uppercase mb-2">Scroll to explore</span>
-        <div className="w-px h-8 bg-stone-400"></div>
-      </Link>
+
+      {/* Floating stat strip — bottom-right */}
+      <div className="absolute bottom-10 right-6 sm:right-12 z-10 hidden md:flex flex-col items-end gap-4">
+        {[
+          { value: "100%", label: "Print on demand" },
+          { value: "48hr", label: "Avg. ship time" },
+        ].map(({ value, label }) => (
+          <div key={label} className="text-right">
+            <div className="text-[#C17D2A] text-2xl font-dm-serif font-bold">{value}</div>
+            <div className="text-[#F5F0E8]/50 text-[10px] tracking-widest uppercase font-inter">{label}</div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

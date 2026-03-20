@@ -1,48 +1,65 @@
 @import "tailwindcss";
 
+/* ── 19th Hole Design System ──────────────────────────────────────────────
+   Palette:
+     Parchment   #F5F0E8  — page background
+     Fairway     #2D5016  — primary green (nav, CTAs)
+     Amber       #C17D2A  — accent, highlights
+     Dusk        #1A1208  — headline text
+     Stone       #7A6E5F  — body / secondary text
+     Cream       #EDE7D9  — card backgrounds, borders
+     Sand        #D4C9B0  — subtle dividers
+──────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --parchment: #F5F0E8;
+  --fairway:   #2D5016;
+  --amber:     #C17D2A;
+  --dusk:      #1A1208;
+  --stone:     #7A6E5F;
+  --cream:     #EDE7D9;
+  --sand:      #D4C9B0;
+
+  --background: var(--parchment);
+  --foreground: var(--dusk);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-dm-serif: var(--font-dm-serif);
-  --font-montserrat: var(--font-montserrat);
+  --font-sans:        var(--font-inter);
+  --font-dm-serif:    var(--font-dm-serif);
+  --font-montserrat:  var(--font-montserrat);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--parchment);
+  color: var(--dusk);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
-/* Custom font utilities */
-.font-dm-serif {
-  font-family: var(--font-dm-serif), Georgia, serif;
-}
+.font-dm-serif   { font-family: var(--font-dm-serif), Georgia, serif; }
+.font-montserrat { font-family: var(--font-montserrat), Arial, sans-serif; }
+.font-inter      { font-family: var(--font-inter), Arial, sans-serif; }
 
-.font-montserrat {
-  font-family: var(--font-montserrat), Arial, sans-serif;
-}
+html { scroll-behavior: smooth; }
 
-.font-inter {
-  font-family: var(--font-inter), Arial, sans-serif;
-}
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Marquee */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.33%); }
 }
+.animate-marquee { animation: marquee 22s linear infinite; }
 
-/* Hide scrollbar but keep functionality */
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Grain texture overlay for warmth */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
 }

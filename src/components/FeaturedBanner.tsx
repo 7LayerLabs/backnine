@@ -1,34 +1,24 @@
 "use client";
 
 export default function FeaturedBanner() {
-  const messages = [
-    { text: "FREE SHIPPING on orders over $75", highlight: "FREE SHIPPING" },
-    { text: "Get 10% OFF your first order — Use code WELCOME10", highlight: "10% OFF" },
-    { text: "From the course to the bar — Gear that keeps up", highlight: "Gear that keeps up" },
+  const items = [
+    { bold: "FREE SHIPPING",  rest: " on orders over $75" },
+    { bold: "WELCOME10",      rest: " — 10% off your first order" },
+    { bold: "Print on demand", rest: " — ships in 48 hours" },
+    { bold: "New drops",       rest: " — headwear & hoodies now live" },
   ];
 
   return (
-    <section className="bg-emerald-700 py-4 overflow-hidden">
-      <div className="relative">
-        <div className="animate-marquee flex whitespace-nowrap">
-          {[...messages, ...messages, ...messages].map((msg, i) => (
-            <span key={i} className="text-white text-sm tracking-wide mx-12">
-              <span className="font-semibold">{msg.highlight}</span>
-              {msg.text.replace(msg.highlight, "")}
-              <span className="mx-8 text-white/50">★</span>
-            </span>
-          ))}
-        </div>
+    <section className="bg-[#2D5016] py-3 overflow-hidden">
+      <div className="animate-marquee flex whitespace-nowrap">
+        {[...items, ...items, ...items].map((msg, i) => (
+          <span key={i} className="text-[#F5F0E8] text-xs tracking-wide mx-10 font-inter">
+            <span className="font-semibold text-[#C17D2A]">{msg.bold}</span>
+            {msg.rest}
+            <span className="mx-8 text-[#F5F0E8]/25">⬥</span>
+          </span>
+        ))}
       </div>
-      <style jsx>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.33%); }
-        }
-        .animate-marquee {
-          animation: marquee 20s linear infinite;
-        }
-      `}</style>
     </section>
   );
 }
