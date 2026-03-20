@@ -76,7 +76,7 @@ export default function LifestyleSection() {
               <div className="absolute inset-0 opacity-10"
                 style={{ backgroundImage: "repeating-linear-gradient(45deg, #F5F0E8 0, #F5F0E8 1px, transparent 0, transparent 50%)", backgroundSize: "14px 14px" }}
               />
-              <p className="text-[#C17D2A] text-xs tracking-[0.4em] uppercase font-montserrat mb-3 relative">The 19th Hole Promise</p>
+              <p className="text-[#C17D2A] text-xs tracking-[0.4em] uppercase font-montserrat mb-3 relative">The Back Nine Promise</p>
               <p className="font-dm-serif text-2xl text-[#F5F0E8] relative leading-snug mb-5">
                 "Look good on the course.<br />
                 <span className="italic">Stay that way after."</span>
