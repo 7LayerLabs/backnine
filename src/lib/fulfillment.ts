@@ -12,6 +12,10 @@ interface OrderItem {
   description?: string;
   quantity: number;
   price: number;
+  // Structured variant data — when present, skips string parsing entirely
+  productId?: string;
+  color?: string;
+  size?: string;
 }
 
 interface ShippingAddress {
@@ -84,7 +88,10 @@ export async function fulfillOrder(
   const skippedItems: string[] = [];
 
   for (const item of items) {
-    const parsed = parseLineItem(item.name);
+    // Prefer structured metadata from Stripe; fall back to string parsing
+    const parsed = (item.productId && item.color !== undefined)
+      ? { productId: item.productId, color: item.color || 'Default', size: item.size }
+      : parseLineItem(item.name);
 
     if (!parsed) {
       console.warn(`Could not parse item: ${item.name}`);
