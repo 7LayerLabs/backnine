@@ -11,7 +11,7 @@ interface OrderItem {
   name: string;
   description?: string;
   quantity: number;
-  price: number;
+  price?: number;
   // Structured variant data — when present, skips string parsing entirely
   productId?: string;
   color?: string;
