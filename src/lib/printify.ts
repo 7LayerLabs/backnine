@@ -141,3 +141,29 @@ export function formatAddressForPrintify(
     zip: shipping.postal_code || '',
   };
 }
+
+// Send order to production - REQUIRED for Printify to actually print and ship
+export async function sendPrintifyOrderToProduction(orderId: string): Promise<PrintifyOrderResponse> {
+  const token = process.env.PRINTIFY_API_TOKEN;
+
+  if (!token) {
+    throw new Error('PRINTIFY_API_TOKEN is not configured');
+  }
+
+  const response = await fetch(
+    `${PRINTIFY_API_URL}/shops/${getPrintifyShopId()}/orders/${orderId}/send_to_production.json`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Printify send to production error: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}

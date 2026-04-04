@@ -1,7 +1,7 @@
 // Fulfillment Service for Back Nine Apparel
 // Routes orders to Printify (apparel) or Printful (headwear) based on product category
 
-import { createPrintifyOrder, formatAddressForPrintify } from './printify';
+import { createPrintifyOrder, sendPrintifyOrderToProduction, formatAddressForPrintify } from './printify';
 import { createPrintfulOrder, confirmPrintfulOrder, formatAddressForPrintful } from './printful';
 import { getProductMapping, getProviderForCategory, FulfillmentProvider } from './product-mapping';
 import { products } from '@/data/products';
@@ -184,6 +184,20 @@ export async function fulfillOrder(
       });
 
       console.log(`Printify order created: ${printifyOrder.id}`);
+
+      // Send to production so Printify actually prints and ships
+      try {
+        await sendPrintifyOrderToProduction(printifyOrder.id);
+        console.log(`Printify order ${printifyOrder.id} sent to production`);
+      } catch (prodError) {
+        console.error(`Failed to send Printify order to production:`, prodError);
+        await logError({
+          error: prodError,
+          context: 'fulfillment-printify-production',
+          severity: 'high',
+          metadata: { orderId, printifyOrderId: printifyOrder.id },
+        });
+      }
     } catch (error) {
       console.error('Printify order failed:', error);
       await logError({
