@@ -3,6 +3,10 @@
 
 const PRINTFUL_API_URL = 'https://api.printful.com';
 
+function getStoreId(): string {
+  return process.env.PRINTFUL_STORE_ID || "17369414";
+}
+
 interface PrintfulRecipient {
   name: string;
   address1: string;
@@ -54,7 +58,7 @@ export async function createPrintfulOrder(
     items,
   };
 
-  const response = await fetch(`${PRINTFUL_API_URL}/orders`, {
+  const response = await fetch(`${PRINTFUL_API_URL}/orders?store_id=${getStoreId()}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -79,7 +83,7 @@ export async function confirmPrintfulOrder(orderId: number): Promise<PrintfulOrd
     throw new Error('PRINTFUL_API_TOKEN is not configured');
   }
 
-  const response = await fetch(`${PRINTFUL_API_URL}/orders/${orderId}/confirm`, {
+  const response = await fetch(`${PRINTFUL_API_URL}/orders/${orderId}/confirm?store_id=${getStoreId()}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -102,7 +106,7 @@ export async function getPrintfulProducts() {
     throw new Error('PRINTFUL_API_TOKEN is not configured');
   }
 
-  const response = await fetch(`${PRINTFUL_API_URL}/store/products`, {
+  const response = await fetch(`${PRINTFUL_API_URL}/store/products?store_id=${getStoreId()}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

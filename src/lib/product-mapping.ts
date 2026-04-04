@@ -35,18 +35,18 @@ const beanieMapping: ProductMapping = {
   ],
 };
 
-// Classic Rope Hat - Printful (using SKUs to identify each design)
+// Classic Rope Hat - Printful (each color is a separate product, use sync_variant_id)
 const ropeCapMapping: ProductMapping = {
   websiteProductId: 'rope-cap-white-green',
   provider: 'printful',
-  printfulProductId: 0, // Multiple products, use SKU to identify
+  printfulProductId: 0,
   variants: [
-    { color: 'White/Green', printfulSku: '693df55ba3e9a1' },
-    { color: 'White/Blue', printfulSku: '693df5ad26e1d4' },
-    { color: 'Navy/Blue', printfulSku: '693df5f3c32ac9' },
-    { color: 'Black/Teal', printfulSku: '693df586aaf016' },
-    { color: 'Black/Gold', printfulSku: '693df53bee5603' },
-    { color: 'Navy/Sunset', printfulSku: '693df4ff59a748' },
+    { color: 'White/Green', printfulSyncVariantId: 5106603291 },
+    { color: 'White/Blue', printfulSyncVariantId: 5106604003 },
+    { color: 'Navy/Blue', printfulSyncVariantId: 5106604637 },
+    { color: 'Black/Teal', printfulSyncVariantId: 5106603707 },
+    { color: 'Black/Gold', printfulSyncVariantId: 5106602732 },
+    { color: 'Navy/Sunset', printfulSyncVariantId: 5106602045 },
   ],
 };
 
