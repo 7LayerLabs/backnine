@@ -58,11 +58,12 @@ export async function createPrintfulOrder(
     items,
   };
 
-  const response = await fetch(`${PRINTFUL_API_URL}/orders?store_id=${getStoreId()}`, {
+  const response = await fetch(`${PRINTFUL_API_URL}/orders`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
+      'X-PF-Store-Id': getStoreId(),
     },
     body: JSON.stringify(orderRequest),
   });
@@ -83,10 +84,11 @@ export async function confirmPrintfulOrder(orderId: number): Promise<PrintfulOrd
     throw new Error('PRINTFUL_API_TOKEN is not configured');
   }
 
-  const response = await fetch(`${PRINTFUL_API_URL}/orders/${orderId}/confirm?store_id=${getStoreId()}`, {
+  const response = await fetch(`${PRINTFUL_API_URL}/orders/${orderId}/confirm`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
+      'X-PF-Store-Id': getStoreId(),
     },
   });
 
@@ -106,9 +108,10 @@ export async function getPrintfulProducts() {
     throw new Error('PRINTFUL_API_TOKEN is not configured');
   }
 
-  const response = await fetch(`${PRINTFUL_API_URL}/store/products?store_id=${getStoreId()}`, {
+  const response = await fetch(`${PRINTFUL_API_URL}/store/products`, {
     headers: {
       'Authorization': `Bearer ${token}`,
+      'X-PF-Store-Id': getStoreId(),
     },
   });
 
