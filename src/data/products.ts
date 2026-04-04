@@ -3,6 +3,7 @@ export interface ColorVariant {
   name: string;
   hex: string;
   image: string;
+  sizes?: string[];
 }
 
 // Product interface with color support
@@ -91,15 +92,15 @@ export const products: Product[] = [
     image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-sport-grey.jpg",
     category: "tops",
     colors: [
-      { name: "Sport Grey", hex: "#9e9e9e", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-sport-grey.jpg" },
-      { name: "White", hex: "#f5f5f5", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-white.jpg" },
-      { name: "Light Blue", hex: "#add8e6", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-light-blue.jpg" },
-      { name: "Light Pink", hex: "#ffb6c1", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-light-pink.jpg" },
-      { name: "Sand", hex: "#c2b280", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-sand.jpg" },
-      { name: "Dark Heather", hex: "#4a4a4a", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-dark-heather.jpg" },
-      { name: "Maroon", hex: "#800000", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-maroon.jpg" },
-      { name: "Red", hex: "#cc0000", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-red.jpg" },
-      { name: "Royal Blue", hex: "#4169e1", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-royal-blue.jpg" },
+      { name: "Sport Grey", hex: "#9e9e9e", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-sport-grey.jpg", sizes: ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"] },
+      { name: "White", hex: "#f5f5f5", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-white.jpg", sizes: ["S", "M", "L", "XL", "2XL"] },
+      { name: "Light Blue", hex: "#add8e6", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-light-blue.jpg", sizes: ["S", "M", "L", "XL", "2XL"] },
+      { name: "Light Pink", hex: "#ffb6c1", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-light-pink.jpg", sizes: ["S", "M", "L", "XL", "2XL"] },
+      { name: "Sand", hex: "#c2b280", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-sand.jpg", sizes: ["S", "M", "L", "XL", "2XL", "3XL"] },
+      { name: "Dark Heather", hex: "#4a4a4a", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-dark-heather.jpg", sizes: ["S", "M", "L", "XL", "2XL"] },
+      { name: "Maroon", hex: "#800000", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-maroon.jpg", sizes: ["S", "M", "L", "XL", "2XL"] },
+      { name: "Red", hex: "#cc0000", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-red.jpg", sizes: ["S", "M", "L", "XL", "2XL", "3XL"] },
+      { name: "Royal Blue", hex: "#4169e1", image: "/sellable items/BackNine Golfer Logo Hoodie/hoodie-royal-blue.jpg", sizes: ["S", "M", "L", "XL", "2XL", "3XL"] },
     ],
     longDescription: "A soft, mid-weight hoodie built for slow mornings on the course and easy nights after the last putt. This hoodie features a clean, minimal golf-themed logo on the chest that reads \"Back Nine Apparel,\" giving it a quietly confident, club-ready look. The roomy kangaroo pocket and double-lined hood hold tees, gloves, and coffee. Wear it over a polo between rounds, drape it in the clubhouse, or pull it on for a cool evening walk along the fairway.",
     features: [

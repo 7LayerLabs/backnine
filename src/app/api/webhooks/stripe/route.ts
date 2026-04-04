@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
           quantity: item.quantity || 1,
           price: (item.amount_total || 0) / 100, // Convert from cents
           productId: productWithMeta?.metadata?.productId || undefined,
-          color: color || undefined,
+          color: color,
           size: size || undefined,
         };
       }) || [];

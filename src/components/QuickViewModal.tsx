@@ -18,11 +18,11 @@ export default function QuickViewModal({
   initialColor,
   onClose
 }: QuickViewModalProps) {
-  const availableSizes = product.sizes || defaultSizes;
-  const [selectedSize, setSelectedSize] = useState(availableSizes[Math.floor(availableSizes.length / 2)] || "M");
   const [selectedColor, setSelectedColor] = useState<ColorVariant | undefined>(
     initialColor ?? product.colors?.[0]
   );
+  const availableSizes = selectedColor?.sizes || product.sizes || defaultSizes;
+  const [selectedSize, setSelectedSize] = useState(availableSizes[Math.floor(availableSizes.length / 2)] || "M");
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "features" | "care">("details");
@@ -47,6 +47,13 @@ export default function QuickViewModal({
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
+
+  useEffect(() => {
+    const sizes = selectedColor?.sizes || product.sizes || defaultSizes;
+    if (!sizes.includes(selectedSize)) {
+      setSelectedSize(sizes[Math.floor(sizes.length / 2)] || "M");
+    }
+  }, [selectedColor, product.sizes, selectedSize]);
 
   const handleAddToCart = () => {
     if (isUnavailable) return;
