@@ -139,6 +139,7 @@ export function formatAddressForPrintify(
     address2: shipping.line2,
     city: shipping.city || '',
     zip: shipping.postal_code || '',
+    phone: '555-000-0000', // Required by Printify API
   };
 }
 
