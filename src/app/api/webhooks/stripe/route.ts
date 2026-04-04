@@ -76,15 +76,17 @@ export async function POST(request: NextRequest) {
         };
       }) || [];
 
-      // Get shipping details - try multiple locations where Stripe puts them
+      // Get shipping details - Stripe puts these in collected_information.shipping_details (newer API)
+      // or shipping_details at top level (older API)
+      type ShippingInfo = { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } };
       const sessionAny = fullSession as unknown as Record<string, unknown>;
-      const shipping = (sessionAny.shipping_details as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined)
-        || (sessionAny.shipping as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined)
-        || ((session as unknown as Record<string, unknown>).shipping_details as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined)
-        || ((session as unknown as Record<string, unknown>).shipping as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined);
-      console.log(`[Shipping Debug] shipping:`, JSON.stringify(shipping));
-      console.log(`[Shipping Debug] fullSession keys:`, Object.keys(sessionAny).filter(k => k.includes('ship')));
-      console.log(`[Shipping Debug] session keys:`, Object.keys(session as unknown as Record<string, unknown>).filter(k => k.includes('ship')));
+      const collectedInfo = sessionAny.collected_information as { shipping_details?: ShippingInfo } | undefined;
+      const shipping: ShippingInfo | undefined =
+        collectedInfo?.shipping_details
+        || (sessionAny.shipping_details as ShippingInfo | undefined)
+        || ((session as unknown as Record<string, unknown>).collected_information as { shipping_details?: ShippingInfo } | undefined)?.shipping_details
+        || ((session as unknown as Record<string, unknown>).shipping_details as ShippingInfo | undefined);
+      console.log(`[Shipping Debug] shipping found:`, JSON.stringify(shipping));
       const customerEmail = fullSession.customer_details?.email;
       const customerName = fullSession.customer_details?.name;
 
