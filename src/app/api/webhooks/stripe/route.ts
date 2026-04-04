@@ -76,8 +76,15 @@ export async function POST(request: NextRequest) {
         };
       }) || [];
 
-      // Get shipping details - use fullSession which has the expanded data
-      const shipping = (fullSession as unknown as { shipping_details?: { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } }).shipping_details;
+      // Get shipping details - try multiple locations where Stripe puts them
+      const sessionAny = fullSession as unknown as Record<string, unknown>;
+      const shipping = (sessionAny.shipping_details as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined)
+        || (sessionAny.shipping as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined)
+        || ((session as unknown as Record<string, unknown>).shipping_details as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined)
+        || ((session as unknown as Record<string, unknown>).shipping as { name?: string; address?: { line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } } | undefined);
+      console.log(`[Shipping Debug] shipping:`, JSON.stringify(shipping));
+      console.log(`[Shipping Debug] fullSession keys:`, Object.keys(sessionAny).filter(k => k.includes('ship')));
+      console.log(`[Shipping Debug] session keys:`, Object.keys(session as unknown as Record<string, unknown>).filter(k => k.includes('ship')));
       const customerEmail = fullSession.customer_details?.email;
       const customerName = fullSession.customer_details?.name;
 

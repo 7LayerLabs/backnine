@@ -63,8 +63,10 @@ export async function POST(request: NextRequest) {
       // Check database products first
       const dbProduct = dbProducts.find((p) => p.id === item.productId);
       if (dbProduct) {
+        // Find matching static product by name for fulfillment-compatible ID
+        const matchingStatic = staticProducts.find((p) => p.name === dbProduct.name);
         product = {
-          id: dbProduct.id,
+          id: matchingStatic?.id || dbProduct.id,
           name: dbProduct.name,
           price: dbProduct.price,
           image: dbProduct.image,
