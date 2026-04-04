@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
           description: product?.description || "",
           quantity: item.quantity || 1,
           price: (item.amount_total || 0) / 100, // Convert from cents
+          productId: productWithMeta?.metadata?.productId || undefined,
           color: color || undefined,
           size: size || undefined,
         };
